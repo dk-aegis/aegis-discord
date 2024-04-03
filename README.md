@@ -32,9 +32,12 @@ you need three config files under config folder
     "moderator_role_id" : "role id",
 	"study_role_id"     : "role id",
 	"graduate_role_id"  : "role id",
-	"student_role_id"   : "role id"
+	"student_role_id"   : "role id",
+    "general_role_id"   : "role id",
+    "executive_privilege": "secure code"
 }
 ```
+
 
 #### ./config/token.json
 ```json
@@ -44,6 +47,7 @@ you need three config files under config folder
 ```
 
 ## 요구사항 
+
 ### Leveling System 
 
 ### Welcome System

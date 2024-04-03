@@ -2,27 +2,24 @@ package service
 
 import (
 	"discord/global"
+
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberUpdate) {
-
-	msg := fmt.Sprintf("Welcome To Aegis Server %s!\n서버가 자동으로 역할을 설정했어요!", m.Nick)
-	s.ChannelMessageSend(global.Discord.WelcomeChannelID, msg)
-	err := s.GuildMemberRoleAdd(
-		global.Discord.GuildID,
-		m.Member.User.ID,
-		global.Discord.StudentRoleID,
-	)
+func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
+	msg := fmt.Sprintf("Welcome To Aegis Server <@%s>!", m.User.ID)
+	_, err := s.ChannelMessageSend(global.Discord.WelcomeChannelID, msg)
 	if err != nil {
-		s.ChannelMessageSend(global.Discord.WelcomeChannelID, "ㅠㅠ (재학생) 역할 설정을 실패했어요!")
-		fmt.Println(err)
+		fmt.Println("in MemberJoin: ", err)
+		return
 	}
-}
-
-func MemberUpdate(s *discordgo.Session, m *discordgo.GuildMemberUpdate) {
+	err = s.GuildMemberRoleAdd(global.Discord.GuildID, m.User.ID, global.Discord.StudentRoleID)
+	if err != nil {
+		fmt.Println("In MemberJoin: ", err)
+		return
+	}
 
 }
 
