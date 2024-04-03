@@ -26,5 +26,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go service.Attendance(s, m)
 	} else if m.Content == "!레벨" {
 		go service.Level(s, m)
+	} else if m.Content == "!역할" {
+		go service.RoleSelect(s, m)
 	}
 }
