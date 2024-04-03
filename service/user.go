@@ -8,33 +8,36 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func Rolerole(s *discordgo.Session, m *discordgo.MessageCreate) {
-	s.ChannelMessageSend(m.ChannelID, "!재학생 또는 !졸업생을 입력해주세요.")
-
-}
-
-func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) { //GuildMemberAdd : 서버에 사람 들어오는거 감지
-	msg := fmt.Sprintf("Welcome To Aegis Server %s!", m.User.Username)
+func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
+	msg := fmt.Sprintf("Welcome To Aegis Server <@%s>!\n\n'재학생 이시면 !재학생, 졸업생 이시면 !졸업생 을 입력해주세요.", m.User.ID)
 	s.ChannelMessageSend(global.Discord.WelcomeChannelID, msg)
-	//member join 후에 역할부여 handler 추가
+	s.GuildMemberRoleAdd(global.Discord.GuildID, m.User.ID, global.Discord.GeneralRoleID)
+
 }
 
 func Level(s *discordgo.Session, m *discordgo.MessageCreate) {
 	s.ChannelMessageSend(m.ChannelID, "현재 해당 기능은 구현되지 않았습니다.")
 }
 
+func Rolerole(s *discordgo.Session, m *discordgo.MessageCreate) {
+	s.ChannelMessageSend(m.ChannelID, "!재학생 또는 !졸업생을 입력해주세요.")
+
+}
+
 func Graduaterole(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	Dmchannel, err := s.UserChannelCreate(m.Author.ID)
 	if err != nil {
-		fmt.Println("실패", err)
+		fmt.Println("error", err)
+		return
+	} else if m.Member.Roles[0] != global.Discord.GeneralRoleID {
 		return
 	}
 
-	msg := " 1+1= ? "
+	msg := " 1+1= ? " //암호 물어보는 메세지
 	_, err = s.ChannelMessageSend(Dmchannel.ID, msg)
 	if err != nil {
-		fmt.Println("실패", err)
+		fmt.Println("error", err)
 		return
 	}
 
@@ -47,11 +50,12 @@ func Graduaterole(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		if m.Content == global.Discord.ExcutivePrivilege { //give a role if code is correct.
 			s.GuildMemberRoleAdd(global.Discord.GuildID, m.Author.ID, global.Discord.GraduateRoleID)
+			s.GuildMemberRoleRemove(global.Discord.GuildID, m.Author.ID, global.Discord.GeneralRoleID)
 			s.ChannelMessageSend(global.Discord.WelcomeChannelID, correctmsg)
 
 			return
 		} else {
-			s.ChannelMessageSend(Dmchannel.ID, "무슨 역할을 받고 싶으신건가요")
+			s.ChannelMessageSend(Dmchannel.ID, "재학생이시죠?")
 		}
 
 	})
@@ -61,14 +65,16 @@ func Graduaterole(s *discordgo.Session, m *discordgo.MessageCreate) {
 func Studentrole(s *discordgo.Session, m *discordgo.MessageCreate) { //암호 아무거나 입력해도 되는 graduaterole
 	Dmchannel, err := s.UserChannelCreate(m.Author.ID)
 	if err != nil {
-		fmt.Println("실패", err)
+		fmt.Println("error", err)
+		return
+	} else if m.Member.Roles[0] != global.Discord.GeneralRoleID {
 		return
 	}
 
-	msg := " 1+1= ? "
+	msg := " 1+1= ? " //암호 물어보는 메세지
 	_, err = s.ChannelMessageSend(Dmchannel.ID, msg)
 	if err != nil {
-		fmt.Println("실패", err)
+		fmt.Println("error", err)
 		return
 	}
 
@@ -79,7 +85,8 @@ func Studentrole(s *discordgo.Session, m *discordgo.MessageCreate) { //암호 �
 		} else if m.Author.ID == s.State.User.ID {
 			return
 		}
-		s.GuildMemberRoleAdd(global.Discord.GuildID, m.Author.ID, global.Discord.GraduateRoleID)
+		s.GuildMemberRoleAdd(global.Discord.GuildID, m.Author.ID, global.Discord.StudentRoleID)
+		s.GuildMemberRoleRemove(global.Discord.GuildID, m.Author.ID, global.Discord.GeneralRoleID)
 		s.ChannelMessageSend(global.Discord.WelcomeChannelID, correctmsg)
 
 	})
