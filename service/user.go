@@ -8,41 +8,79 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+func Rolerole(s *discordgo.Session, m *discordgo.MessageCreate) {
+	s.ChannelMessageSend(m.ChannelID, "!재학생 또는 !졸업생을 입력해주세요.")
+
+}
+
 func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) { //GuildMemberAdd : 서버에 사람 들어오는거 감지
-	msg := fmt.Sprintf("Welcome To Aegis Server %s!\n\n\n재학생이면 \"재학생\"을 입력하시고 졸업생이면 \"졸업생\"을 입력하세요.", s.State.User.Username)
+	msg := fmt.Sprintf("Welcome To Aegis Server %s!", m.User.Username)
 	s.ChannelMessageSend(global.Discord.WelcomeChannelID, msg)
-	
-
 	//member join 후에 역할부여 handler 추가
-}
-
-func RoleSelect(s *discordgo.Session, m *discordgo.MessageUpdate) {
-	if 
-	
-
-	
-
-	if m.Content == "재학생" {
-
-		s.GuildMemberRoleAdd(m.GuildID, m.Author.ID, global.Discord.StudentRoleID)
-		s.ChannelMessageSend(global.Discord.WelcomeChannelID, "설정 완료")
-
-	} else if m.Content == "졸업생" {
-
-		s.GuildMemberRoleAdd(m.GuildID, m.Author.ID, global.Discord.GraduateRoleID)
-		s.ChannelMessageSend(global.Discord.WelcomeChannelID, "설정 완료")
-
-	} else {
-		return
-	} // 예외의 입력이 들어왔을때인데 날리는 메시지, 근데 서버 들어오는 메세지 보고 이거 날려버림
-	// 그리고 핸들러 비활성화 시키는 방법을 아직 못찾음...
-
-}
-
-func MemberUpdate(s *discordgo.Session, m *discordgo.GuildMemberUpdate) {
-
 }
 
 func Level(s *discordgo.Session, m *discordgo.MessageCreate) {
 	s.ChannelMessageSend(m.ChannelID, "현재 해당 기능은 구현되지 않았습니다.")
+}
+
+func Graduaterole(s *discordgo.Session, m *discordgo.MessageCreate) {
+
+	Dmchannel, err := s.UserChannelCreate(m.Author.ID)
+	if err != nil {
+		fmt.Println("실패", err)
+		return
+	}
+
+	msg := " 1+1= ? "
+	_, err = s.ChannelMessageSend(Dmchannel.ID, msg)
+	if err != nil {
+		fmt.Println("실패", err)
+		return
+	}
+
+	s.AddHandlerOnce(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		correctmsg := fmt.Sprintf("<@%s>님의 역할 설정 완료 되었습니다.", m.Author.ID)
+		if Dmchannel.ID != m.ChannelID { //check the channel the message  received is  Direct Message.
+			return
+		} else if m.Author.ID == s.State.User.ID {
+			return
+		}
+		if m.Content == global.Discord.ExcutivePrivilege { //give a role if code is correct.
+			s.GuildMemberRoleAdd(global.Discord.GuildID, m.Author.ID, global.Discord.GraduateRoleID)
+			s.ChannelMessageSend(global.Discord.WelcomeChannelID, correctmsg)
+
+			return
+		} else {
+			s.ChannelMessageSend(Dmchannel.ID, "무슨 역할을 받고 싶으신건가요")
+		}
+
+	})
+
+}
+
+func Studentrole(s *discordgo.Session, m *discordgo.MessageCreate) { //암호 아무거나 입력해도 되는 graduaterole
+	Dmchannel, err := s.UserChannelCreate(m.Author.ID)
+	if err != nil {
+		fmt.Println("실패", err)
+		return
+	}
+
+	msg := " 1+1= ? "
+	_, err = s.ChannelMessageSend(Dmchannel.ID, msg)
+	if err != nil {
+		fmt.Println("실패", err)
+		return
+	}
+
+	s.AddHandlerOnce(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		correctmsg := fmt.Sprintf("<@%s>님의 역할 설정 완료 되었습니다.", m.Author.ID)
+		if Dmchannel.ID != m.ChannelID { //check the channel the message  received is  Direct Message.
+			return
+		} else if m.Author.ID == s.State.User.ID {
+			return
+		}
+		s.GuildMemberRoleAdd(global.Discord.GuildID, m.Author.ID, global.Discord.GraduateRoleID)
+		s.ChannelMessageSend(global.Discord.WelcomeChannelID, correctmsg)
+
+	})
 }

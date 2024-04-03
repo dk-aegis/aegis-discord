@@ -6,12 +6,13 @@ import (
 )
 
 type DiscordConfig struct {
-	GuildID          string `json:"guild_id"`
-	WelcomeChannelID string `json:"welcome_channel_id"`
-	ModeratorRoleID  string `json:"moderator_role_id"`
-	StudyRoleID      string `json:"study_role_id"`
-	GraduateRoleID   string `json:"graduate_role_id"`
-	StudentRoleID    string `json:"student_role_id"`
+	GuildID           string `json:"guild_id"`
+	WelcomeChannelID  string `json:"welcome_channel_id"`
+	ModeratorRoleID   string `json:"moderator_role_id"`
+	StudyRoleID       string `json:"study_role_id"`
+	GraduateRoleID    string `json:"graduate_role_id"`
+	StudentRoleID     string `json:"student_role_id"`
+	ExcutivePrivilege string `json:"executive_privilege"`
 }
 
 var Discord DiscordConfig

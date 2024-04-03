@@ -64,7 +64,7 @@ func main() {
 	dg.AddHandler(service.MemberJoin)
 
 	// In this example, we only care about receiving message events.
-	dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuildMembers | discordgo.IntentsGuilds
+	dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuildMembers | discordgo.IntentsGuilds | discordgo.IntentsDirectMessages
 
 	// Open a websocket connection to Discord and begin listening.
 	err = dg.Open()
