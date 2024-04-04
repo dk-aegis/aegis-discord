@@ -15,6 +15,7 @@ func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 		fmt.Println("in MemberJoin: ", err)
 		return
 	}
+
 	err = s.GuildMemberRoleAdd(global.Discord.GuildID, m.User.ID, global.Discord.StudentRoleID)
 	if err != nil {
 		fmt.Println("In MemberJoin: ", err)
