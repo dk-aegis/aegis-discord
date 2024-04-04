@@ -30,6 +30,8 @@ func HelpMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		!레벨: 현재 유저 레벨(미구현).
 
 		!홈페이지: Aegis 동아리 홈페이지.
+
+		!슬롯: 슬롯머신을 돌립니다.
 	`
 	sendEmbedMessage(s, m.ChannelID, "명령어 도움말", msg, 0x00ff00)
 }
