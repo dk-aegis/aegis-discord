@@ -12,7 +12,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// Ignore all messages created by the bot itself
 	// This isn't required in this specific example but it's a good practice.
-	if m.Author.ID == s.State.User.ID {
+	if m.Author.Bot {
 		return
 	}
 
@@ -30,6 +30,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go service.Attendance(s, m)
 	} else if m.Content == "!슬롯" {
 		go service.Slotmachine(s, m)
+	} else if m.Content == "!정보등록" {
+		go service.Regist_user(s, m)
 	}
 
 }

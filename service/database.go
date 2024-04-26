@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 )
 
 var db *sql.DB
@@ -24,6 +25,7 @@ func InitDatabase() error {
 	file, err := os.Open("./config/db_config.json")
 
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -41,4 +43,25 @@ func InitDatabase() error {
 	}
 
 	return nil
+}
+
+type UserInfo struct {
+	AccountID int
+	RegistDay time.Time
+}
+
+func LoadAccount(hashed_id string) (UserInfo, error) { //아직 미완성
+	query := fmt.Sprintf("SELECT account_id, regist_day FROM account WHERE user_id = %s", hashed_id)
+	var userinfo UserInfo
+
+	err := db.QueryRow(query).Scan(userinfo.AccountID, userinfo.RegistDay)
+
+	if err != nil {
+		return userinfo, err
+	}
+	return userinfo, err
+}
+
+func DBclose() {
+	db.Close()
 }

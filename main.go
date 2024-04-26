@@ -47,13 +47,13 @@ func main() {
 	}
 
 	service.InitEvent()
-	err = service.InitDatabase()
+	err = service.InitDatabase() //DB on..
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	err = global.InitDiscordConfig()
+	err = global.InitDiscordConfig() //config file on..
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -81,4 +81,5 @@ func main() {
 
 	// Cleanly close down the Discord session.
 	dg.Close()
+
 }
