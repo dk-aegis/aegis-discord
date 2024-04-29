@@ -74,24 +74,32 @@ func Regist_user(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	}
 
 	acc_query := "INSERT INTO account (user_id, salt, regist_day) VALUES (?,?,CURRENT_DATE)"
-	play_query := "INSERT INTO players (exp,money) VALUES (0,10000)"
-	attend_query := "INSERT INTO attendance (attend,last_date) VALUES (0,CURRENT_DATE)"
+	play_query := "INSERT INTO players (player_id,exp,money) VALUES (?,0,10000)"
+	attend_query := "INSERT INTO attendance (attend_id,attend,last_date) VALUES (?,0,CURRENT_DATE)"
 
-	_, err = ta.Exec(acc_query, hashString, salt)
+	uniqnumb, err := ta.Exec(acc_query, hashString, salt)
 	if err != nil {
 		ta.Rollback()
 		fmt.Println(err)
 		return err
 	}
 
-	_, err = ta.Exec(play_query)
+	uninum, err := uniqnumb.LastInsertId() //이런것을 활용하라.
+
 	if err != nil {
 		ta.Rollback()
 		fmt.Println(err)
 		return err
 	}
 
-	_, err = ta.Exec(attend_query)
+	_, err = ta.Exec(play_query, uninum)
+	if err != nil {
+		ta.Rollback()
+		fmt.Println(err)
+		return err
+	}
+
+	_, err = ta.Exec(attend_query, uninum)
 	if err != nil {
 		ta.Rollback()
 		fmt.Println(err)
