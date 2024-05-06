@@ -34,7 +34,7 @@ func Slotmachine(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
-	msg := fmt.Sprintf(":white_small_square: :white_small_square: :white_small_square:\n%s %s %s\n%s %s %s\n%s %s %s\n:white_small_square: :white_small_square: :white_small_square:", slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9)
+	msg := fmt.Sprintf(":white_small_square: :white_small_square: :white_small_square:\n%s %s %s\n%s %s %s :arrow_left:\n%s %s %s\n:white_small_square: :white_small_square: :white_small_square:", slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9)
 	message_, err = s.ChannelMessageSend(m.ChannelID, msg)
 	if err != nil {
 		fmt.Println("SendMessageError", err)
@@ -47,7 +47,7 @@ func Slotmachine(s *discordgo.Session, m *discordgo.MessageCreate) {
 		slot1, slot2, slot3 = Emojilist[slotlist[0][i+2]], Emojilist[slotlist[1][i+2]], Emojilist[slotlist[2][i+2]]
 		slot4, slot5, slot6 = Emojilist[slotlist[0][i+1]], Emojilist[slotlist[1][i+1]], Emojilist[slotlist[2][i+1]]
 		slot7, slot8, slot9 = Emojilist[slotlist[0][i]], Emojilist[slotlist[1][i]], Emojilist[slotlist[2][i]]
-		msg := fmt.Sprintf(":white_small_square: :white_small_square: :white_small_square:\n%s %s %s\n%s %s %s\n%s %s %s\n:white_small_square: :white_small_square: :white_small_square:", slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9)
+		msg := fmt.Sprintf(":white_small_square: :white_small_square: :white_small_square:\n%s %s %s\n%s %s %s :arrow_left:\n%s %s %s\n:white_small_square: :white_small_square: :white_small_square:", slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9)
 		_, err = s.ChannelMessageEdit(m.ChannelID, message_.ID, msg)
 		time.Sleep(time.Millisecond * 300)
 		if err != nil {

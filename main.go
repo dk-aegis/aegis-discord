@@ -63,7 +63,7 @@ func main() {
 	dg.AddHandler(messageCreate)
 	dg.AddHandler(service.MemberJoin)
 
-	// In this example, we only care about receiving message events.
+	// 디스코드봇의 권한을 설정하는것같은..
 	dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuildMembers | discordgo.IntentsGuilds | discordgo.IntentsDirectMessages
 
 	// Open a websocket connection to Discord and begin listening.
@@ -81,5 +81,5 @@ func main() {
 
 	// Cleanly close down the Discord session.
 	dg.Close()
-
+	service.DBclose()
 }

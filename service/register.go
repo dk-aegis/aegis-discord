@@ -1,7 +1,6 @@
 package service
 
 import (
-	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -9,17 +8,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func generatesalt() (string, error) {
-
-	salt := make([]byte, 8)
-	_, err := rand.Read(salt)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	return hex.EncodeToString(salt), nil
-
+func hashstring(str string) string { //hasinghasing
+	hash := sha256.Sum256([]byte(str))
+	hashString := hex.EncodeToString(hash[:])
+	return string(hashString)
 }
 
 func Regist_user(s *discordgo.Session, m *discordgo.MessageCreate) error {
@@ -32,17 +24,9 @@ func Regist_user(s *discordgo.Session, m *discordgo.MessageCreate) error {
 		return err
 	}
 
-	salt, err := generatesalt()
-
-	id := m.Author.ID
-	user_id := fmt.Sprintf("%s%s", salt, id)
+	user_id := m.Author.ID
 	hash := sha256.Sum256([]byte(user_id)) //userid해싱
 	hashString := hex.EncodeToString(hash[:])
-
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
 
 	ta, err := db.Begin() //transaction on.
 
@@ -62,7 +46,7 @@ func Regist_user(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	}
 
 	if count != 0 {
-		ta.Rollback() //transaction die.
+		ta.Rollback()
 		msg := "이미 등록되어있습니다."
 		_, err := s.ChannelMessageSend(m.ChannelID, msg)
 
@@ -73,33 +57,25 @@ func Regist_user(s *discordgo.Session, m *discordgo.MessageCreate) error {
 
 	}
 
-	acc_query := "INSERT INTO account (user_id, salt, regist_day) VALUES (?,?,CURRENT_DATE)"
+	acc_query := "INSERT INTO account (user_id, regist_day) VALUES (?,CURRENT_DATE)"
 	play_query := "INSERT INTO players (player_id,exp,money) VALUES (?,0,10000)"
-	attend_query := "INSERT INTO attendance (attend_id,attend,last_date) VALUES (?,0,CURRENT_DATE)"
+	attend_query := "INSERT INTO attendance (attend_id,attendance,last_seen) VALUES (?,0,CURRENT_DATE)"
 
-	uniqnumb, err := ta.Exec(acc_query, hashString, salt)
+	_, err = ta.Exec(acc_query, hashString)
 	if err != nil {
 		ta.Rollback()
 		fmt.Println(err)
 		return err
 	}
 
-	uninum, err := uniqnumb.LastInsertId() //이런것을 활용하라.
-
+	_, err = ta.Exec(play_query, hashString)
 	if err != nil {
 		ta.Rollback()
 		fmt.Println(err)
 		return err
 	}
 
-	_, err = ta.Exec(play_query, uninum)
-	if err != nil {
-		ta.Rollback()
-		fmt.Println(err)
-		return err
-	}
-
-	_, err = ta.Exec(attend_query, uninum)
+	_, err = ta.Exec(attend_query, hashString)
 	if err != nil {
 		ta.Rollback()
 		fmt.Println(err)

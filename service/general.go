@@ -32,6 +32,8 @@ func HelpMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		!홈페이지: Aegis 동아리 홈페이지.
 
 		!슬롯: 슬롯머신을 돌립니다.
+
+		!정보등록: 출석체크와 기타 기능을 사용하기 위해 정보를 등록합니다.
 	`
 	sendEmbedMessage(s, m.ChannelID, "명령어 도움말", msg, 0x00ff00)
 }

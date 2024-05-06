@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"time"
 )
 
 var db *sql.DB
@@ -45,21 +44,97 @@ func InitDatabase() error {
 	return nil
 }
 
-type UserInfo struct {
-	AccountID int
-	RegistDay time.Time
+type userinfo struct {
+	AccountID string
+	RegistDay string
 }
 
-func LoadAccount(hashed_id string) (UserInfo, error) { //아직 미완성
-	query := fmt.Sprintf("SELECT account_id, regist_day FROM account WHERE user_id = %s", hashed_id)
-	var userinfo UserInfo
+func LoadAccount(hashed_id string) (userinfo, error) {
+	query := "SELECT user_id, regist_day FROM account WHERE ?"
+	var info userinfo
 
-	err := db.QueryRow(query).Scan(userinfo.AccountID, userinfo.RegistDay)
-
+	err := db.QueryRow(query, hashed_id).Scan(&info.AccountID, &info.RegistDay)
 	if err != nil {
-		return userinfo, err
+		return userinfo{}, err
 	}
-	return userinfo, err
+
+	return info, nil
+
+}
+
+type attendance struct {
+	attendacne int
+	lastseen   string
+}
+
+func LoadAttendance(hashed_id string) (attendance, error) {
+	query := "SELECT attendance, last_seen FROM attendance WHERE ?"
+	var info attendance
+
+	err := db.QueryRow(query, hashed_id).Scan(&info.attendacne, &info.lastseen)
+	if err != nil {
+		return attendance{}, err
+	}
+
+	return info, nil
+
+}
+
+type players struct {
+	money int
+	exp   int
+}
+
+func LoadPlayers(hashed_id string) (players, error) {
+	query := "SELECT money,exp FROM players WHERE ?"
+	var info players
+
+	err := db.QueryRow(query, hashed_id).Scan(&info.money, &info.exp)
+	if err != nil {
+		return players{}, err
+	}
+
+	return info, nil
+
+}
+
+type notice struct {
+	id        int
+	fromdate  string
+	untildate string
+	title     string
+	content   string
+}
+
+func LoadNotice(hashed_id string) (notice, error) {
+	query := "SELECT notice_id,fromdate,untildate,title,content FROM notice WHERE ?"
+	var info notice
+
+	err := db.QueryRow(query, hashed_id).Scan(&info.id, &info.fromdate, &info.untildate, &info.title, &info.content)
+	if err != nil {
+		return notice{}, err
+	}
+
+	return info, nil
+}
+
+func CheckAdmin(hashed_id string) (bool, error) {
+	query := "SELECT COUNT(*) FROM root WHERE user_id = ?"
+
+	var count int
+
+	err := db.QueryRow(query, hashed_id).Scan(&count)
+	if err != nil {
+		fmt.Println("관리자 인증 오류 발생")
+		return false, err
+	}
+
+	if count != 0 {
+		return true, nil
+	} else {
+		return false, nil
+	}
+
 }
 
 func DBclose() {
