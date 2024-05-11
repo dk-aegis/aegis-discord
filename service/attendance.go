@@ -1,68 +1,68 @@
 package service
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-/**
-
- */
-
-type At struct {
-	NickHash string
-	Date     string
-	SeqCount int
-}
-
 func Attendance(s *discordgo.Session, m *discordgo.MessageCreate) {
-	user_id := m.Author.ID
-	hash := sha256.Sum256([]byte(user_id))
-	hashString := hex.EncodeToString(hash[:])
-
+	hashString := Hashstring(m.Author.ID)
 	/* 닉네임해쉬로부터 출석 정보를 불러옴 */
-	at, err := LoadAttendance(string(hashString))
+	at, err := LoadAttendance(hashString)
 	if err != nil {
 		fmt.Println(err)
-		msg := fmt.Sprintf("%s님의 출석에 문제가 생겼어요!", m.Member.Nick)
+		msg := "출석에 문제가 생겼어요!"
 		s.ChannelMessageSend(m.ChannelID, msg)
 		return
 	}
 
-	fmt.Println(at.attendacne, at.lastseen)
+	query := `
+	UPDATE attendance
+	SET attend_count = attend_count + 1, last_seen = CURRENT_DATE
+	WHERE attend_id = ? AND ? != CURRENT_DATE`
 
-	/* 중복 출석 체크*/
-
-	/* 연속 출석 체크 */
-	setAttendance()
-
-	/* 출석 진행 */
-	updateAttendance()
-}
-
-/*
-*	사용자의 출석 정보를 불러온다.
- */
-func loadAttendances(nick string) (At, error) {
-	query := fmt.Sprintf("select * from attendance where nick=%s", nick)
-	at := At{}
-	err := db.QueryRow(query).Scan(at.NickHash, at.Date, at.SeqCount)
-
+	sqlresult, err := db.Exec(query, hashString, at.lastseen)
 	if err != nil {
-		return at, err
+		fmt.Println(err)
+		return
 	}
 
-	return at, err
-}
+	update, err := sqlresult.RowsAffected()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-func setAttendance() {
+	if update == 0 {
+		msg := "이미 출석을 하셨습니다."
+		_, err = s.ChannelMessageSend(m.ChannelID, msg)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 
-}
+		return
+	}
 
-func updateAttendance() {
+	err = GiveMoney(hashString, 1000)
+	if err != nil {
+		fmt.Println("money 지급에 문제가 생겼어요")
+		return
+	}
+
+	err = GiveExp(hashString, 10)
+	if err != nil {
+		fmt.Println("exp 지급에 문제가 생겼어요")
+		return
+	}
+
+	msg := "출석처리완료"
+	_, err = s.ChannelMessageSend(m.ChannelID, msg)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 }

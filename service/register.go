@@ -8,7 +8,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func hashstring(str string) string { //hasinghasing
+func Hashstring(str string) string { //hasinghasing
 	hash := sha256.Sum256([]byte(str))
 	hashString := hex.EncodeToString(hash[:])
 	return string(hashString)
@@ -24,9 +24,7 @@ func Regist_user(s *discordgo.Session, m *discordgo.MessageCreate) error {
 		return err
 	}
 
-	user_id := m.Author.ID
-	hash := sha256.Sum256([]byte(user_id)) //userid해싱
-	hashString := hex.EncodeToString(hash[:])
+	hashString := Hashstring(m.Author.ID)
 
 	ta, err := db.Begin() //transaction on.
 
@@ -37,7 +35,9 @@ func Regist_user(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	}
 
 	var count int
-	query := "SELECT COUNT(*) FROM account WHERE user_id = ?"
+	query := `SELECT COUNT(*) 
+	FROM account 
+	WHERE user_id = ?`
 	err = ta.QueryRow(query, hashString).Scan(&count)
 
 	if err != nil {
@@ -59,7 +59,7 @@ func Regist_user(s *discordgo.Session, m *discordgo.MessageCreate) error {
 
 	acc_query := "INSERT INTO account (user_id, regist_day) VALUES (?,CURRENT_DATE)"
 	play_query := "INSERT INTO players (player_id,exp,money) VALUES (?,0,10000)"
-	attend_query := "INSERT INTO attendance (attend_id,attendance,last_seen) VALUES (?,0,CURRENT_DATE)"
+	attend_query := "INSERT INTO attendance (attend_id,attend_count,last_seen) VALUES (?,1,CURRENT_DATE)"
 
 	_, err = ta.Exec(acc_query, hashString)
 	if err != nil {

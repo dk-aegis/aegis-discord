@@ -24,8 +24,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go service.HelpMessage(s, m)
 	} else if m.Content == "!출석" {
 		go service.Attendance(s, m)
-	} else if m.Content == "!레벨" {
-		go service.Level(s, m)
 	} else if m.Content == "!출석체크" {
 		go service.Attendance(s, m)
 	} else if m.Content == "!슬롯" {

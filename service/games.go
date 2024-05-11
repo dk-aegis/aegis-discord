@@ -9,7 +9,26 @@ import (
 )
 
 func Slotmachine(s *discordgo.Session, m *discordgo.MessageCreate) {
-	_, err := s.ChannelMessageSend(m.ChannelID, "**--SLOTS--**")
+
+	hashString := Hashstring(m.Author.ID)
+
+	playermoney, err := LoadPlayers(hashString)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if playermoney.money < 10 {
+		_, err = s.ChannelMessageSend(m.ChannelID, "돈이 부족해요!")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		return
+	}
+
+	_, err = s.ChannelMessageSend(m.ChannelID, "**--SLOTS--**")
 	if err != nil {
 		fmt.Println("SendMessageError", err)
 		return
@@ -34,7 +53,11 @@ func Slotmachine(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
-	msg := fmt.Sprintf(":white_small_square: :white_small_square: :white_small_square:\n%s %s %s\n%s %s %s :arrow_left:\n%s %s %s\n:white_small_square: :white_small_square: :white_small_square:", slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9)
+	msg := fmt.Sprintf(`:white_small_square: :white_small_square: :white_small_square:
+%s %s %s
+%s %s %s :arrow_left:
+%s %s %s
+:white_small_square: :white_small_square: :white_small_square:`, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9)
 	message_, err = s.ChannelMessageSend(m.ChannelID, msg)
 	if err != nil {
 		fmt.Println("SendMessageError", err)
@@ -47,25 +70,42 @@ func Slotmachine(s *discordgo.Session, m *discordgo.MessageCreate) {
 		slot1, slot2, slot3 = Emojilist[slotlist[0][i+2]], Emojilist[slotlist[1][i+2]], Emojilist[slotlist[2][i+2]]
 		slot4, slot5, slot6 = Emojilist[slotlist[0][i+1]], Emojilist[slotlist[1][i+1]], Emojilist[slotlist[2][i+1]]
 		slot7, slot8, slot9 = Emojilist[slotlist[0][i]], Emojilist[slotlist[1][i]], Emojilist[slotlist[2][i]]
-		msg := fmt.Sprintf(":white_small_square: :white_small_square: :white_small_square:\n%s %s %s\n%s %s %s :arrow_left:\n%s %s %s\n:white_small_square: :white_small_square: :white_small_square:", slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9)
+		msg := fmt.Sprintf(`:white_small_square: :white_small_square: :white_small_square:
+%s %s %s
+%s %s %s :arrow_left:
+%s %s %s
+:white_small_square: :white_small_square: :white_small_square:`, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9)
 		_, err = s.ChannelMessageEdit(m.ChannelID, message_.ID, msg)
 		time.Sleep(time.Millisecond * 300)
 		if err != nil {
-			fmt.Println("SendMessageError", err)
+			fmt.Println(err)
 			return
 		}
 	}
 
-	if slot4 == Emojilist[1] && slot4 == slot5 && slot5 == slot6 {
+	if slot4 == slot5 && slot5 == slot6 {
 		_, err = s.ChannelMessageSend(m.ChannelID, "잭팟!")
 		if err != nil {
-			fmt.Println("SendMessageError", err)
+			fmt.Println(err)
 			return
 		}
+
+		err = GiveMoney(hashString, 5000)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
 	} else {
 		_, err = s.ChannelMessageSend(m.ChannelID, "실패!")
 		if err != nil {
-			fmt.Println("SendMessageError", err)
+			fmt.Println(err)
+			return
+		}
+
+		err = GiveMoney(hashString, -10)
+		if err != nil {
+			fmt.Println(err)
 			return
 		}
 

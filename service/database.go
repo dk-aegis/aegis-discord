@@ -50,7 +50,7 @@ type userinfo struct {
 }
 
 func LoadAccount(hashed_id string) (userinfo, error) {
-	query := "SELECT user_id, regist_day FROM account WHERE ?"
+	query := "SELECT user_id, regist_day FROM account WHERE acc_id = ?"
 	var info userinfo
 
 	err := db.QueryRow(query, hashed_id).Scan(&info.AccountID, &info.RegistDay)
@@ -68,7 +68,7 @@ type attendance struct {
 }
 
 func LoadAttendance(hashed_id string) (attendance, error) {
-	query := "SELECT attendance, last_seen FROM attendance WHERE ?"
+	query := "SELECT attend_count, last_seen FROM attendance WHERE attend_id = ?"
 	var info attendance
 
 	err := db.QueryRow(query, hashed_id).Scan(&info.attendacne, &info.lastseen)
@@ -86,7 +86,7 @@ type players struct {
 }
 
 func LoadPlayers(hashed_id string) (players, error) {
-	query := "SELECT money,exp FROM players WHERE ?"
+	query := "SELECT money,exp FROM players WHERE player_id = ?"
 	var info players
 
 	err := db.QueryRow(query, hashed_id).Scan(&info.money, &info.exp)
@@ -98,7 +98,7 @@ func LoadPlayers(hashed_id string) (players, error) {
 
 }
 
-type notice struct {
+type notice struct { //공지는 따로 손을 봐야겠음
 	id        int
 	fromdate  string
 	untildate string
@@ -119,7 +119,7 @@ func LoadNotice(hashed_id string) (notice, error) {
 }
 
 func CheckAdmin(hashed_id string) (bool, error) {
-	query := "SELECT COUNT(*) FROM root WHERE user_id = ?"
+	query := "SELECT COUNT(*) FROM root WHERE admin_id = ?"
 
 	var count int
 

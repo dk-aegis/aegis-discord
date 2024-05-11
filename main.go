@@ -64,7 +64,7 @@ func main() {
 	dg.AddHandler(service.MemberJoin)
 
 	// 디스코드봇의 권한을 설정하는것같은..
-	dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuildMembers | discordgo.IntentsGuilds | discordgo.IntentsDirectMessages
+	dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuildMembers | discordgo.IntentsGuilds | discordgo.IntentsDirectMessages | discordgo.IntentsGuildPresences
 
 	// Open a websocket connection to Discord and begin listening.
 	err = dg.Open()
