@@ -56,11 +56,54 @@ func GiveExp(hashString string, exp int) error {
 	return nil
 }
 
-func CheckMoney(hashString string) (int, error) {
+func CheckMoney(s *discordgo.Session, m *discordgo.MessageCreate) {
+
+	id := m.Author.ID
+	hashString := Hashstring(id)
 	play, err := LoadPlayers(hashString)
 	if err != nil {
 		fmt.Println(err)
-		return 0, err
+		return
 	}
-	return play.money, nil
+	msg := fmt.Sprintf("<@%s>님이 소지중인 money(은)는 %d 입니다!", id, play.money)
+	_, err = s.ChannelMessageSend(m.ChannelID, msg)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func CheckExp(s *discordgo.Session, m *discordgo.MessageCreate) {
+
+	id := m.Author.ID
+	hashString := Hashstring(id)
+	play, err := LoadPlayers(hashString)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	msg := fmt.Sprintf("<@%s>님이 소지중인 exp(은)는 %d 입니다!", id, play.exp)
+	_, err = s.ChannelMessageSend(m.ChannelID, msg)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func Checkattend(s *discordgo.Session, m *discordgo.MessageCreate) {
+
+	id := m.Author.ID
+	hashString := Hashstring(id)
+	att, err := LoadAttendance(hashString)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	msg := fmt.Sprintf("<@%s>님의 출석일수(은)는 %d일 입니다!", id, att.attendacne)
+	_, err = s.ChannelMessageSend(m.ChannelID, msg)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }

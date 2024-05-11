@@ -73,6 +73,8 @@ func main() {
 		return
 	}
 
+	dg.UpdateWatchStatus(1, "'!정보등록'을 입력하셔야 기능을 사용할 수 있어요")
+
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)

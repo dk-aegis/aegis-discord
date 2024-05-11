@@ -22,6 +22,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go service.ShowHomepage(s, m)
 	} else if m.Content == "!도움말" {
 		go service.HelpMessage(s, m)
+	} else if m.Content == "!명령어" {
+		go service.HelpMessage(s, m)
 	} else if m.Content == "!출석" {
 		go service.Attendance(s, m)
 	} else if m.Content == "!출석체크" {
@@ -30,6 +32,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go service.Slotmachine(s, m)
 	} else if m.Content == "!정보등록" {
 		go service.Regist_user(s, m)
+	} else if m.Content == "!돈" {
+		go service.CheckMoney(s, m)
+	} else if m.Content == "!경험치" {
+		go service.CheckExp(s, m)
+	} else if m.Content == "!출석일수" {
+		go service.Checkattend(s, m)
 	}
 
 }
