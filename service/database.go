@@ -68,6 +68,7 @@ type attendance struct {
 }
 
 func LoadAttendance(hashed_id string) (attendance, error) {
+
 	query := "SELECT attend_count, last_seen FROM attendance WHERE attend_id = ?"
 	var info attendance
 
