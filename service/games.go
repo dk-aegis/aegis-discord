@@ -84,7 +84,7 @@ func Slotmachine(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if slot4 == slot5 && slot5 == slot6 {
-		_, err = s.ChannelMessageSend(m.ChannelID, "잭팟!")
+		_, err = s.ChannelMessageSend(m.ChannelID, "잭팟! (money += 5000)")
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -97,7 +97,7 @@ func Slotmachine(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 	} else {
-		_, err = s.ChannelMessageSend(m.ChannelID, "실패!")
+		_, err = s.ChannelMessageSend(m.ChannelID, "실패! (money -= 10)")
 		if err != nil {
 			fmt.Println(err)
 			return

@@ -13,11 +13,12 @@ type Event struct {
 	Content   string
 }
 
+// 엠베드 메세지로 다 출력할거임. 엠베드 메세지 하는법 좀 공부 ㄱㄱ
 var eventList []Event
 
 func ShowEvent(s *discordgo.Session, m *discordgo.MessageCreate) {
 
-	if len(eventList) == 0 {
+	if len(eventList) == 0 { //이벤트가 3개 이상이면 뭘 볼지 선택하세요
 		sendEmbedMessage(s, m.ChannelID, "ㅠㅠ", "현재 진행중인 이벤트가 없습니다.", 0x00ff00)
 		return
 	}
@@ -45,4 +46,16 @@ func sendEmbedMessage(s *discordgo.Session, chid, title, content string, color i
 		fmt.Println("Error sending embedded message:", err)
 		return
 	}
+}
+
+func CreateEvent(s *discordgo.Session, m *discordgo.MessageCreate) {
+
+}
+
+func RemoveEvent(s *discordgo.Session, m *discordgo.MessageCreate) {
+
+}
+
+func ShowEventLists(m *discordgo.MessageCreate) {
+
 }
