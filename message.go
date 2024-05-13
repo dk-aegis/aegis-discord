@@ -40,8 +40,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	} else if m.Content == "!출석일수" {
 		go service.Checkattend(s, m)
 	} else if m.Content == "!이벤트 목록" {
-		go service.ShowEventLists(m)
-	} else if strings.HasPrefix(m.Content, "!이벤트 등록 ") { //input form !prefix Title Content fromdate untildate
+		go service.ShowEventLists(s, m)
+	} else if strings.HasPrefix(m.Content, "!이벤트 등록 ") { //input form !prefix Title \ Content \원본글URL \ fromdate \ untildate
 		go service.CreateEvent(s, m)
 	} else if strings.HasPrefix(m.Content, "!이벤트 삭제 ") { //input form
 		go service.RemoveEvent(s, m)

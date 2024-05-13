@@ -99,19 +99,20 @@ func LoadPlayers(hashed_id string) (players, error) {
 
 }
 
-type notice struct { //공지는 따로 손을 봐야겠음
+type notice struct {
 	id        int
 	fromdate  string
 	untildate string
 	title     string
 	content   string
+	url       string
 }
 
 func LoadNotice(hashed_id string) (notice, error) {
 	query := "SELECT notice_id,fromdate,untildate,title,content FROM notice WHERE ?"
 	var info notice
 
-	err := db.QueryRow(query, hashed_id).Scan(&info.id, &info.fromdate, &info.untildate, &info.title, &info.content)
+	err := db.QueryRow(query, hashed_id).Scan(&info.id, &info.fromdate, &info.untildate, &info.title, &info.content, &info.url)
 	if err != nil {
 		return notice{}, err
 	}
@@ -135,7 +136,6 @@ func CheckAdmin(hashed_id string) (bool, error) {
 	} else {
 		return false, nil
 	}
-
 }
 
 func DBclose() {
