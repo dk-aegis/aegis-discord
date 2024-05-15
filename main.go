@@ -46,7 +46,6 @@ func main() {
 		return
 	}
 
-	service.InitEvent()
 	err = service.InitDatabase() //DB on..
 	if err != nil {
 		fmt.Println(err)

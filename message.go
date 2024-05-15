@@ -17,9 +17,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if m.Content == "!이벤트" {
-		go service.ShowEvent(s, m)
-	} else if m.Content == "!홈페이지" {
+	if m.Content == "!홈페이지" {
 		go service.ShowHomepage(s, m)
 	} else if m.Content == "!도움말" {
 		go service.HelpMessage(s, m)
@@ -41,9 +39,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go service.Checkattend(s, m)
 	} else if m.Content == "!이벤트 목록" {
 		go service.ShowEventLists(s, m)
-	} else if strings.HasPrefix(m.Content, "!이벤트 등록 ") { //input form !prefix Title \ Content \원본글URL \ fromdate \ untildate
+	} else if strings.HasPrefix(m.Content, "!이벤트 등록 ") { //input form !prefix Title | Content |원본글URL | fromdate | untildate
 		go service.CreateEvent(s, m)
 	} else if strings.HasPrefix(m.Content, "!이벤트 삭제 ") { //input form
 		go service.RemoveEvent(s, m)
+	} else if strings.HasPrefix(m.Content, "!이벤트") {
+		go service.ShowEvents(s, m)
 	}
 }

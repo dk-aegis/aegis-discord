@@ -2,19 +2,11 @@ package service
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
-
-type Event struct {
-	FromDate  string
-	UntilDate string
-	Title     string
-	Content   string
-}
-
-// 엠베드 메세지로 다 출력할거임. 엠베드 메세지 하는법 좀 공부 ㄱㄱ
 
 func sendEmbedMessage(s *discordgo.Session, chid, title, content string, color int) {
 	embed := &discordgo.MessageEmbed{
@@ -31,32 +23,13 @@ func sendEmbedMessage(s *discordgo.Session, chid, title, content string, color i
 	}
 }
 
-var eventList []Event
-
-func ShowEvent(s *discordgo.Session, m *discordgo.MessageCreate) {
-
-	if len(eventList) == 0 { //이벤트가 3개 이상이면 뭘 볼지 선택하세요
-		sendEmbedMessage(s, m.ChannelID, "ㅠㅠ", "현재 진행중인 이벤트가 없습니다.", 0x00ff00)
-		return
-	}
-
-	for _, event := range eventList {
-		sendEmbedMessage(s, m.ChannelID, event.Title, event.String(), 0x00ff00)
-	}
-}
-
-func (e Event) String() string {
-	s := fmt.Sprintf("**%s**\n\n시작 날짜: %s\n\n종료 날짜: %s\n", e.Content, e.FromDate, e.UntilDate)
-	return s
-}
-
 // input form !prefix Title Content 원본글URL fromdate untildate
-func CreateEvent(s *discordgo.Session, m *discordgo.MessageCreate) error {
+func CreateEvent(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	check, err := CheckAdmin(Hashstring(m.Author.ID)) //권한체크  권한이 없다는것도 출력해야됨.
 	if (err != nil) || (!check) {
 		fmt.Println(err)
-		return err
+		return
 	}
 
 	args := strings.Split(m.Content[18:], "|") //'!이벤트 등록' 이 8문자를 죽이고 시작 , 구분자는 | (shift+\)
@@ -65,9 +38,9 @@ func CreateEvent(s *discordgo.Session, m *discordgo.MessageCreate) error {
 		msg := "인수가 부족해요"
 		_, err = s.ChannelMessageSend(m.ChannelID, msg) //인수가 부족한가??
 		if err != nil {
-			return err
+			return
 		}
-		return nil
+		return
 	}
 
 	query := `INSERT INTO notice (title, content, noticeurl, fromdate, untildate)
@@ -77,7 +50,7 @@ func CreateEvent(s *discordgo.Session, m *discordgo.MessageCreate) error {
 
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return
 	}
 
 	affected, err := sql.RowsAffected()
@@ -85,13 +58,13 @@ func CreateEvent(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	check = (affected == 0)
 
 	if check || (err != nil) {
-		msg := "공지 삭제에 실패했습니다!"
+		msg := "이벤트 등록을 실패했습니다!"
 		_, err = s.ChannelMessageSend(m.ChannelID, msg)
 		if err != nil {
-			return err
+			return
 		}
 
-		return (err)
+		return
 	}
 
 	msg := "이벤트 등록 완료."
@@ -99,10 +72,9 @@ func CreateEvent(s *discordgo.Session, m *discordgo.MessageCreate) error {
 
 	if err != nil {
 		fmt.Println(err)
-		return err
-	}
+		return
 
-	return nil
+	}
 }
 
 // input form : !prefix notice_id
@@ -113,9 +85,7 @@ func RemoveEvent(s *discordgo.Session, m *discordgo.MessageCreate) error {
 		return err
 	}
 
-	event := strings.TrimPrefix(m.Content, "!이벤트 삭제 ")
-
-	args := strings.TrimSpace(event)
+	args := strings.TrimSpace(m.Content[18:])
 
 	query := `DELETE FROM notice WHERE notice_id = ?`
 
@@ -150,26 +120,72 @@ func RemoveEvent(s *discordgo.Session, m *discordgo.MessageCreate) error {
 
 func ShowEvents(s *discordgo.Session, m *discordgo.MessageCreate) {
 
-	embed := &discordgo.MessageEmbed{
-		URL:         "https://discord.com/channels/1223177363722862612/1223177363722862616/1239501454348128287",
-		Title:       "이벤트 목록",
-		Description: "위 링크를 클릭해주세요",
+	var title, content, fromdate, untildate, url, query string
+	var id int
+	var count int
+	var err error
+
+	query = "SELECT COUNT(*) FROM notice"
+	err = db.QueryRow(query).Scan(&count)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if count == 0 { //공지가 없어요 ㅠㅠ
+		fmt.Println(err)
+		return
+	}
+
+	args, _ := strings.CutPrefix(m.Content, "!이벤트")
+
+	args = strings.ReplaceAll(args, " ", "")
+
+	if args == "" {
+		query = `SELECT title, content, fromdate, untildate, noticeurl FROM notice ORDER BY notice_id DESC LIMIT ?`
+		id = 1
+	} else {
+		num, err := strconv.Atoi(args)
+
+		if err != nil { //숫자를 입력해주세요~!!
+			fmt.Println(err)
+			return
+		}
+
+		query = `SELECT title, content, fromdate, untildate, noticeurl FROM notice WHERE notice_id = ?`
+		id = num
+	}
+
+	err = db.QueryRow(query, id).Scan(&title, &content, &fromdate, &untildate, &url)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	url = strings.ReplaceAll(url, "\u2060", "")
+
+	embed := &discordgo.MessageEmbed{ //URL 아닌 에러 처리해야됨.
+		Title:       title,
+		Description: content,
 		Color:       0x1f1e33,
+		URL:         url,
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:   "시작날짜",
-				Value:  "1999-92-92",
+				Value:  fromdate,
 				Inline: true,
 			},
 			{
 				Name:   "종료날짜",
-				Value:  "2000-02-02",
+				Value:  untildate,
 				Inline: true,
 			},
 		},
 	}
 
-	_, err := s.ChannelMessageSendEmbed(m.ChannelID, embed)
+	_, err = s.ChannelMessageSendEmbed(m.ChannelID, embed)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -181,23 +197,43 @@ func ShowEventLists(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	embed := &discordgo.MessageEmbed{
 		Title:       "이벤트 목록",
-		Description: "!이벤트 {id} 를 해보세요",
+		Description: "!이벤트 num 를 입력해보세요",
 		Color:       0x1f1e33,
-		Fields: []*discordgo.MessageEmbedField{
-			{
-				Name:   "시작날짜",
-				Value:  "1999-92-92",
-				Inline: true,
-			},
-			{
-				Name:   "종료날짜",
-				Value:  "2000-02-02",
-				Inline: true,
-			},
-		},
+		Fields:      []*discordgo.MessageEmbedField{},
 	}
 
-	_, err := s.ChannelMessageSendEmbed(m.ChannelID, embed)
+	query := `SELECT notice_id, title, fromdate, untildate FROM notice`
+
+	rows, err := db.Query(query)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for rows.Next() {
+		var notice int
+		var title, fromdate, untildate string
+
+		err := rows.Scan(&notice, &title, &fromdate, &untildate)
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		name := fmt.Sprintf("%d: %s", notice, title)
+		value := fmt.Sprintf("%s~%s", fromdate, untildate)
+
+		field := &discordgo.MessageEmbedField{
+			Name:   name,
+			Value:  value,
+			Inline: true,
+		}
+
+		embed.Fields = append(embed.Fields, field)
+
+	}
+	_, err = s.ChannelMessageSendEmbed(m.ChannelID, embed)
 	if err != nil {
 		fmt.Println(err)
 		return
