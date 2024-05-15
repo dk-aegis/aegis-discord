@@ -164,7 +164,8 @@ func ShowEvents(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	url = strings.ReplaceAll(url, "\u2060", "")
+	url = strings.ReplaceAll(url, "\u2060", "") //문자열로 받으니까 \u2060 이거 때문에 http 형식으로
+	//인식을 못해서 에러가남 그래서 지워준다.
 
 	embed := &discordgo.MessageEmbed{ //URL 아닌 에러 처리해야됨.
 		Title:       title,
