@@ -1,4 +1,5 @@
 *.yaml
 *.json
-config/
 *.exe
+config/
+
