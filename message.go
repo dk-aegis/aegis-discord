@@ -12,22 +12,31 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// Ignore all messages created by the bot itself
 	// This isn't required in this specific example but it's a good practice.
-	if m.Author.ID == s.State.User.ID {
+	if m.Author.Bot {
 		return
 	}
 
-	if m.Content == "!이벤트" {
-		go service.ShowEvent(s, m)
-	} else if m.Content == "!홈페이지" {
+	if m.Content == "!홈페이지" {
 		go service.ShowHomepage(s, m)
 	} else if m.Content == "!도움말" {
 		go service.HelpMessage(s, m)
+	} else if m.Content == "!명령어" {
+		go service.HelpMessage(s, m)
 	} else if m.Content == "!출석" {
 		go service.Attendance(s, m)
-	} else if m.Content == "!레벨" {
-		go service.Level(s, m)
 	} else if m.Content == "!출석체크" {
 		go service.Attendance(s, m)
+	} else if m.Content == "!슬롯" {
+		go service.Slotmachine(s, m)
+	} else if m.Content == "!정보등록" {
+		go service.Regist_user(s, m)
+	} else if m.Content == "!돈" {
+		go service.CheckMoney(s, m)
+	} else if m.Content == "!경험치" {
+		go service.CheckExp(s, m)
+	} else if m.Content == "!출석일수" {
+		go service.Checkattend(s, m)
+	} else if m.Content == "!이벤트 목록" {
+		go service.ShowEventLists(s, m)
 	}
-
 }

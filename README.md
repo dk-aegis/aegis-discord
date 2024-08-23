@@ -38,7 +38,6 @@ you need three config files under config folder
 }
 ```
 
-
 #### ./config/token.json
 ```json
 {
@@ -47,9 +46,8 @@ you need three config files under config folder
 ```
 
 ## 요구사항 
+### Leveling System   check
 
-### Leveling System 
+### Welcome System    check
 
-### Welcome System
-
-### Attendance System
+### Attendance System check
