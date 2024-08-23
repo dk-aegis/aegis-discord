@@ -34,37 +34,38 @@ func getToken() (TokenConfig, error) {
 	return tc, nil
 }
 
-var commands = []*discordgo.ApplicationCommand{
-	{
-		Name: "ping",
-		//모든 command 와 option 은 description 을 가져야한다고함.
-		Description: "Responds with pong",
-	},
-	{
-		Name:        "pong",
-		Description: "Responds with ping",
-	},
-}
+/*
+	var commands = []*discordgo.ApplicationCommand{
+		{
+			Name: "ping",
+			//모든 command 와 option 은 description 을 가져야한다고함.
+			Description: "Responds with pong",
+		},
+		{
+			Name:        "pong",
+			Description: "Responds with ping",
+		},
+	}
 
-var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-	"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: "pong",
-			},
-		})
-	},
-	"pong": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: "ping",
-			},
-		})
-	},
-}
-
+	var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
+		"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "pong",
+				},
+			})
+		},
+		"pong": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "ping",
+				},
+			})
+		},
+	}
+*/
 func main() {
 
 	// Create a new Discord session using the provided bot token.
