@@ -74,6 +74,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				Image: &discordgo.MessageEmbedImage{
 					URL: "https://cdn.discordapp.com/attachments/1276518219414503547/1276518291816448111/20240823_212612.jpg?ex=66c9d1cd&is=66c8804d&hm=d47a842b833b442e3aff3f94ec3865cf4256318accae3fd97e5f4815778faa33&",
 				},
+				Color: 0xa5ea89,
 			}
 			s.ChannelMessageEditEmbed(i.ChannelID, Door_id, embed)
 		} else {
@@ -101,6 +102,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				Image: &discordgo.MessageEmbedImage{
 					URL: "https://cdn.discordapp.com/attachments/1276518219414503547/1276518281263710249/20240823_212621.jpg?ex=66c9d1ca&is=66c8804a&hm=cdaac532d7c9782f373507f17a232c8bb8da1bf4e2d67941aa71c826cb2332b8&",
 				},
+				Color: 0xff8e7f,
 			}
 			s.ChannelMessageEditEmbed(i.ChannelID, Door_id, embed)
 		} else {
