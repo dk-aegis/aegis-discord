@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/bwmarrin/discordgo"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -9,7 +11,7 @@ func ShowHomepage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	sendEmbedMessage(s, m.ChannelID, "Aegis 홈페이지", "https://dk-aegis.org", 0x00ff00)
 }
 
-func HelpMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
+func HelpMessage(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	msg := `
 		!도움말: 명령어 목록 도움말을 확인합니다.
 
@@ -28,12 +30,22 @@ func HelpMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		!경험치: 현재 보유중인 경험치를 확인합니다.
 
 		!출석일수: 현재까지 출석한 일수를 확인합니다.
-
-		!이벤트 목록: 이벤트 목록을 출력합니다.
-
-		(권한필요)!이벤트 {등록} {제목} {내용} {공지글URL} {시작날짜} {종료날짜}: 이벤트를 등록합니다
-
-		(권한필요)!이벤트 삭제 {id}: 이벤트를 삭제합니다.
 	`
-	sendEmbedMessage(s, m.ChannelID, "명령어 도움말", msg, 0x00ff00)
+	embed := &discordgo.MessageEmbed{
+		Title:       "commands",
+		Description: msg,
+		Color:       0x00ff00,
+	}
+
+	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Embeds: []*discordgo.MessageEmbed{embed},
+		},
+	})
+
+	if err != nil {
+		fmt.Println("error response", err)
+		return
+	}
 }

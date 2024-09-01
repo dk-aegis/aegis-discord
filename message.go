@@ -18,10 +18,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if m.Content == "!홈페이지" {
 		go service.ShowHomepage(s, m)
-	} else if m.Content == "!도움말" {
-		go service.HelpMessage(s, m)
-	} else if m.Content == "!명령어" {
-		go service.HelpMessage(s, m)
 	} else if m.Content == "!출석" {
 		go service.Attendance(s, m)
 	} else if m.Content == "!출석체크" {
