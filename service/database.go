@@ -17,7 +17,7 @@ type DbConfig struct {
 	Password string `json:"password"`
 	Database string `json:"database"`
 	Protocol string `json:"protocol"`
-}
+}	
 
 func InitDatabase() error {
 	var dc DbConfig

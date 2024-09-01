@@ -9,7 +9,6 @@ import (
 
 func Attendance(s *discordgo.Session, m *discordgo.MessageCreate) {
 	hashString := Hashstring(m.Author.ID)
-	/* 닉네임해쉬로부터 출석 정보를 불러옴 ... 근데 그냥 유저 ID 로 부터 하면 됨. 어차피 공개되어 있음 */
 	at, err := LoadAttendance(hashString)
 	if err != nil {
 		fmt.Println(err)

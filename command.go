@@ -1,17 +1,16 @@
 package main
 
 /*
-이 파일에서는 slash command 를 정의합니다.
+이 파일에서는 slash command 를 정의합니다. package main 에 둠으로써 바로 쓸수있게 했습니다.
 */
 
 import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var commands = []*discordgo.ApplicationCommand{
+var commands = []*discordgo.ApplicationCommand{  //discordgo.
 	{
-		Name: "ping",
-		//모든 command 와 option 은 description 을 가져야한다고함.
+		Name: "ping", //모든 command 와 option 은 description 을 가져야한다고함.
 		Description: "Responds with pong",
 	},
 	{
@@ -34,6 +33,7 @@ var commands = []*discordgo.ApplicationCommand{
 		Description: "한 채널에 문의 상태를 보여주는 임베드메세지를 보냅니다. 문 관련된 명령어는 문등록 명령어를 실행한 채널에서만 가능합니다.",
 	},
 }
+
 var (
 	Chan_id string //문등록으로 설정된 채널의 ID
 	Door_id string //문등록으로 보낸 메세지의 ID 를 전역변수로 선언

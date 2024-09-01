@@ -34,38 +34,6 @@ func getToken() (TokenConfig, error) {
 	return tc, nil
 }
 
-/*
-	var commands = []*discordgo.ApplicationCommand{
-		{
-			Name: "ping",
-			//모든 command 와 option 은 description 을 가져야한다고함.
-			Description: "Responds with pong",
-		},
-		{
-			Name:        "pong",
-			Description: "Responds with ping",
-		},
-	}
-
-	var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "pong",
-				},
-			})
-		},
-		"pong": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "ping",
-				},
-			})
-		},
-	}
-*/
 func main() {
 
 	// Create a new Discord session using the provided bot token.
@@ -74,7 +42,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	dg, err := discordgo.New("Bot " + tc.Token)
+	dg, err := discordgo.New("Bot " + tc.Token) //session 을 생성합니다. 이 session 으로 discordbot 의 동작이나 상태를 관리할 수 있습니다.
 	if err != nil {
 		fmt.Println("error creating Discord session,", err)
 		return
@@ -93,12 +61,16 @@ func main() {
 	}
 
 	// Register the messageCreate func as a callback for MessageCreate events.
-	dg.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if handler, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
+	//AddHandler 는 인자가 2개인 함수를 인자로 받음. 첫번째는 세션, 두번째는 이벤트...
+
+	//commandHandlers 는 [string]func(s,i) map 이므로, commands 에서 참조로 ApplicationComand 를 수정했기에 Name 을 조회하며 함수가 있으면 ok가 되어 핸들러 등록이 되는듯.
+	dg.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {  //Interaction 이 생성되었을 떄의 handler 을 정의한다.
+		if handler, ok := commandHandlers[i.ApplicationCommandData().Name]; //맵 조회 패턴. handler 는 함수가 들어갈것이고 ok 에는 맵에 값이 있는지를 표현하는 불리언값임
+		 ok { 
 			handler(s, i)
 		}
 	})
-	dg.AddHandler(messageCreate)
+	dg.AddHandler(messageCreate)   
 	dg.AddHandler(service.MemberJoin)
 
 	// 디스코드봇의 권한을 설정하는것같은..
@@ -112,14 +84,14 @@ func main() {
 	}
 
 	fmt.Println("Adding Commands!")
-	for _, cmd := range commands {
-		_, err := dg.ApplicationCommandCreate(dg.State.User.ID, tc.GuildID, cmd)
+	for _, cmd := range commands { //cmd가 명령어 같긴 한데.. 뭘 무시하고 cmd 를 받는건지 잘 모르겠네
+		_, err := dg.ApplicationCommandCreate(dg.State.User.ID, tc.GuildID, cmd) //SlashCommands 를 추가합니다. 봇의 ID / 길드ID / 명령어
 		if err != nil {
-			log.Fatalf("Cannot create Command..")
+			log.Fatalf("Cannot create Command.. Error at : %s",cmd.Name)
 		}
 	}
 
-	dg.UpdateWatchStatus(1, "'!정보등록'을 입력하셔야 기능을 사용할 수 있어요") //디코봇 상태 메세지 설정
+	dg.UpdateWatchStatus(1, "/도움말") //디코봇 상태 메세지 설정
 
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
