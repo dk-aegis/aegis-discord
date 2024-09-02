@@ -1,8 +1,8 @@
 # Discord Bot 
 Aegis Discord Bot
 
-# 이 프로젝트는 discordgo 패키지가 관리가 안되는거 같아서 버립니다. JS로 갈아탐 ㅂㅂ
-전부터 생각했는데 닉네임을 받아오지 못함. 써져있는 대로 써봤는데 안맞는 부분이 있어서 버려야 할듯?
+# nick 받아오려면 직접 설정되어 있어야함. !!!!!!!!! 
+
 ## Run
 ```BASH
 git clone https://github.com/dk-aegis/aegis-discord.git

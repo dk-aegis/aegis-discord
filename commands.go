@@ -11,12 +11,12 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var commands = []*discordgo.ApplicationCommand{ 
+var commands = []*discordgo.ApplicationCommand{
 
 	//general commands
 	{
 		//모든 command 와 option 은 description 을 가져야한다고함.
-		Name:        "ping", 
+		Name:        "ping",
 		Description: "Responds with pong",
 	},
 	{
@@ -31,16 +31,20 @@ var commands = []*discordgo.ApplicationCommand{
 	//동방에 사람이 얼마나 있는지 확인하는 명령어
 
 	{
-		Name: "착석",
+		Name:        "착석",
 		Description: "자리 하나를 차지합니다",
 	},
 	{
-		Name: "기립",
+		Name:        "기립",
 		Description: "자리를 하나 내어줍니다",
 	},
 	{
-		Name: "좌석상황",
+		Name:        "좌석상황",
 		Description: "현재 동아리방의 좌석 상황을 보여줍니다",
+	},
+	{
+		Name:        "역할부여",
+		Description: "역할부여하기도식이",
 	},
 
 	// 문 관련 명령어들
@@ -84,18 +88,23 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: "ping",
-				
 			},
 		})
 		if err != nil {
 			fmt.Println("error response", err)
 			return
-		} 
+		}
 	},
 	"help": service.HelpMessage,
-	"착석": service.TakeaSeat,
-	"기립": service.Standup,
+	"착석":   service.TakeaSeat,
+	"기립":   service.Standup,
 	"좌석상황": service.CheckSeatState,
+	"역할부여": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		err := s.GuildMemberNickname(i.GuildID, i.Member.User.ID, "doshik")
+		if err != nil {
+			return
+		}
+	},
 
 	"문열기": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
