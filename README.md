@@ -1,6 +1,8 @@
 # Discord Bot 
 Aegis Discord Bot
 
+# 이 프로젝트는 discordgo 패키지가 관리가 안되는거 같아서 버립니다. JS로 갈아탐 ㅂㅂ
+
 ## Run
 ```BASH
 git clone https://github.com/dk-aegis/aegis-discord.git
