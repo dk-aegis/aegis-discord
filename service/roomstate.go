@@ -9,13 +9,13 @@ import (
 /*
 	{
 		Name:   ":white_check_mark:",
-		Value:  "안모씨",
-		Inline: false,
+		Value:  "24누군가",
+		Inline: true,
 	},
 	{
 		Name:   ":x:",
 		Value:  "공석",
-		Inline: false,
+		Inline: true,
 	},
 
 */
@@ -85,13 +85,12 @@ func countEmpty(table []*discordgo.MessageEmbedField) int {
 }
 
 func existOnTable(table []*discordgo.MessageEmbedField, userName string) bool {
-	var exist bool = false
 	for _, now := range table {
-		if now.Name != ":x:" && now.Value == "userName" {
-			exist = true
+		if now.Value == userName {
+			return true
 		}
 	}
-	return exist
+	return false
 }
 
 /*
@@ -100,30 +99,50 @@ func existOnTable(table []*discordgo.MessageEmbedField, userName string) bool {
 */
 func TakeaSeat(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
-	//Member 접근할 때 nil 검사하는게 좋다고 해서 그냥 해줌.
+	Nickname := i.Member.Nick
 
-	m := i.Member
-	if m == nil {
-		fmt.Println("member info error ~~", m)
+	if countEmpty(RoomStateEmbed.Fields) <= 0 { //빈자리 없다!
+		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "빈 좌석이 없어요",
+			},
+		})
+		if err != nil {
+			fmt.Println("error response", err)
+		}
+		return
 	}
 
-	aa := i.Member.Nick
-	fmt.Println(aa)
-
-	msg := fmt.Sprintf("안녕하세요 %s", "1")
-
-	s.ChannelMessageSend(i.ChannelID, msg)
-	/*
-		if countEmpty(RoomStateEmbed.Fields) == 0 { //빈자리 없다!
-			s.ChannelMessageSend(i.ChannelID, "차지할 수 있는 좌석이 없어요!") // Out
-			return
+	if existOnTable(RoomStateEmbed.Fields, Nickname) {
+		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "이미 좌석을 차지하고 계십니다",
+			},
+		})
+		if err != nil {
+			fmt.Println("error response", err)
 		}
+		return
+	}
 
-		if existOnTable(RoomStateEmbed.Fields, userName) {
-			s.ChannelMessageSend(i.ChannelID, "이미 좌석을 차지하고 계십니다") // Out
-			return
+	//상태 바꿈
+	for index, now := range RoomStateEmbed.Fields {
+		if now.Name == ":x:" {
+			RoomStateEmbed.Fields[index].Name = ":white_check_mark:"
+			RoomStateEmbed.Fields[index].Value = Nickname
+			break
 		}
-	*/
+	}
+
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseUpdateMessage,
+		Data: &discordgo.InteractionResponseData{
+			Embeds:     []*discordgo.MessageEmbed{RoomStateEmbed},
+		},
+	})
+
 }
 
 func Standup(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -136,6 +155,36 @@ func CheckSeatState(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Embeds: []*discordgo.MessageEmbed{RoomStateEmbed},
+			Components: []discordgo.MessageComponent{
+				discordgo.ActionsRow{
+					Components: []discordgo.MessageComponent{
+						discordgo.Button{
+							Label:    "착석",
+							Style:    discordgo.SuccessButton,
+							CustomID: "sitdown_btn",
+							Emoji: discordgo.ComponentEmoji{
+								Name: "🧘", // Unicode 이모지가 들어가야함 window + . 으로 하는 이모지만 들어갈 수 있음 :x: 이런식이면 에러남.
+							},
+						},
+						discordgo.Button{
+							Label:    "기립",
+							Style:    discordgo.DangerButton,
+							CustomID: "standup_btn",
+							Emoji: discordgo.ComponentEmoji{
+								Name: "🏃",
+							},
+						},
+						discordgo.Button{
+							Label:    "Exit",
+							Style:    discordgo.DangerButton,
+							CustomID: "exit_btn",
+							Emoji: discordgo.ComponentEmoji{
+								Name: "❌",
+							},
+						},
+					},
+				},
+			},
 		},
 	})
 
