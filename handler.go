@@ -20,8 +20,8 @@ func InteractionHandler(s *discordgo.Session, i *discordgo.InteractionCreate) { 
 		case "sitdown_btn":
 			service.TakeaSeat(s, i)
 		case "standup_btn":
-			
-			s.ChannelMessageSend(i.ChannelID, "누르지마")
+
+			service.Standup(s, i)
 		}
 	}
 }

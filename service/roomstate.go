@@ -139,7 +139,7 @@ func TakeaSeat(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseUpdateMessage,
 		Data: &discordgo.InteractionResponseData{
-			Embeds:     []*discordgo.MessageEmbed{RoomStateEmbed},
+			Embeds: []*discordgo.MessageEmbed{RoomStateEmbed},
 		},
 	})
 
@@ -147,6 +147,37 @@ func TakeaSeat(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 func Standup(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
+	Nickname := i.Member.Nick
+
+	if existOnTable(RoomStateEmbed.Fields, Nickname) {
+
+		fmt.Println("ㅎㅇ?")
+
+
+		for index, now := range RoomStateEmbed.Fields {
+			if now.Name == Nickname {
+				RoomStateEmbed.Fields[index].Name = ":X:"
+				RoomStateEmbed.Fields[index].Value = "공석"
+				break
+			}
+		}
+
+
+	} else {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "좌석에 없습니다",
+			},
+		})
+	}
+
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseUpdateMessage,
+		Data: &discordgo.InteractionResponseData{
+			Embeds: []*discordgo.MessageEmbed{RoomStateEmbed},
+		},
+	})
 }
 
 func CheckSeatState(s *discordgo.Session, i *discordgo.InteractionCreate) {
