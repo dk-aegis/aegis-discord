@@ -155,7 +155,7 @@ func Standup(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 
 		for index, now := range RoomStateEmbed.Fields {
-			if now.Name == Nickname {
+			if now.Value == Nickname {
 				RoomStateEmbed.Fields[index].Name = ":X:"
 				RoomStateEmbed.Fields[index].Value = "공석"
 				break
