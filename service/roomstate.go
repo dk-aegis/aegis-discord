@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"regexp"
+
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -9,7 +11,7 @@ import (
 /*
 	{
 		Name:   ":white_check_mark:",
-		Value:  "24누군가",
+		Value:  "24누군가(상태)",          여기서 졸업생이면 숫자가 없을 수도 있음.
 		Inline: true,
 	},
 	{
@@ -91,6 +93,11 @@ func existOnTable(table []*discordgo.MessageEmbedField, userName string) bool {
 		}
 	}
 	return false
+}
+
+func sliceName(name string) string{
+	re := regexp.MustCompile(`^\d*|\(.*?\)$`)
+	return re.ReplaceAllString(name, "")
 }
 
 /*
