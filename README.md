@@ -38,8 +38,7 @@ you need three config files under config folder
 	"study_role_id"     : "role id",
 	"graduate_role_id"  : "role id",
 	"student_role_id"   : "role id",
-    "general_role_id"   : "role id",
-    "executive_privilege": "secure code"
+    "general_role_id"   : "role id"
 }
 ```
 
