@@ -1,6 +1,11 @@
 # Discord Bot 
 Aegis Discord Bot
 
+# nick 받아오려면 직접 설정되어 있어야함. !!!!!!!!! 
+이걸 몇개월 동안 못찾았다니 말도안된다. 서버 내에서 직접 Nick 이 설정되어 있어야지 값이 나옴. 아니면 empty string 이 나오기 때문에.
+Nick 기반으로 할거니까, Nickname 설정 변경 못하도록 권한을 줍시다.
+
+
 ## Run
 ```BASH
 git clone https://github.com/dk-aegis/aegis-discord.git
