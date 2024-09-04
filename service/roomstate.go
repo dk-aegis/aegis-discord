@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"regexp"
 
-
 	"github.com/bwmarrin/discordgo"
 )
 
 /*
 	{
 		Name:   ":white_check_mark:",
-		Value:  "24누군가(상태)",          여기서 졸업생이면 숫자가 없을 수도 있음.
+		Value:  "24누군가(상태)",          여기서 졸업생이면 숫자가 없을 수도 있음. 이름만 잘라서 넣기.
 		Inline: true,
 	},
 	{
@@ -29,47 +28,47 @@ var RoomStateEmbed *discordgo.MessageEmbed = &discordgo.MessageEmbed{
 	//임베드 메세지의 필드로서 자리는 한 9개 정도 해놓음.
 	Fields: []*discordgo.MessageEmbedField{
 		{
-			Name:   ":x:",
+			Name:   "❌",
 			Value:  "공석",
 			Inline: true,
 		},
 		{
-			Name:   ":x:",
+			Name:   "❌",
 			Value:  "공석",
 			Inline: true,
 		},
 		{
-			Name:   ":x:",
+			Name:   "❌",
 			Value:  "공석",
 			Inline: true,
 		},
 		{
-			Name:   ":x:",
+			Name:   "❌",
 			Value:  "공석",
 			Inline: true,
 		},
 		{
-			Name:   ":x:",
+			Name:   "❌",
 			Value:  "공석",
 			Inline: true,
 		},
 		{
-			Name:   ":x:",
+			Name:   "❌",
 			Value:  "공석",
 			Inline: true,
 		},
 		{
-			Name:   ":x:",
+			Name:   "❌",
 			Value:  "공석",
 			Inline: true,
 		},
 		{
-			Name:   ":x:",
+			Name:   "❌",
 			Value:  "공석",
 			Inline: true,
 		},
 		{
-			Name:   ":x:",
+			Name:   "❌",
 			Value:  "공석",
 			Inline: true,
 		},
@@ -79,7 +78,7 @@ var RoomStateEmbed *discordgo.MessageEmbed = &discordgo.MessageEmbed{
 func countEmpty(table []*discordgo.MessageEmbedField) int {
 	var count int = 0
 	for _, now := range table {
-		if now.Name == ":x:" && now.Value == "공석" {
+		if now.Name == "❌" && now.Value == "공석" {
 			count++
 		}
 	}
@@ -95,7 +94,8 @@ func existOnTable(table []*discordgo.MessageEmbedField, userName string) bool {
 	return false
 }
 
-func sliceName(name string) string{
+// 이름남 남깁니다.
+func sliceName(name string) string {
 	re := regexp.MustCompile(`^\d*|\(.*?\)$`)
 	return re.ReplaceAllString(name, "")
 }
@@ -106,7 +106,7 @@ func sliceName(name string) string{
 */
 func TakeaSeat(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
-	Nickname := i.Member.Nick
+	Nickname := sliceName(i.Member.Nick)
 
 	if countEmpty(RoomStateEmbed.Fields) <= 0 { //빈자리 없다!
 		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -136,38 +136,30 @@ func TakeaSeat(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	//상태 바꿈
 	for index, now := range RoomStateEmbed.Fields {
-		if now.Name == ":x:" {
-			RoomStateEmbed.Fields[index].Name = ":white_check_mark:"
+		if now.Name == "❌" {
+			RoomStateEmbed.Fields[index].Name = "✅"
 			RoomStateEmbed.Fields[index].Value = Nickname
 			break
 		}
 	}
 
-	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseUpdateMessage,
-		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{RoomStateEmbed},
-		},
-	})
+	UpdateRoomState(s, i)
 
 }
 
 func Standup(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
-	Nickname := i.Member.Nick
+	Nickname := sliceName(i.Member.Nick)
 
 	if existOnTable(RoomStateEmbed.Fields, Nickname) {
 
-		fmt.Println("ㅎㅇ?")
-
 		for index, now := range RoomStateEmbed.Fields {
 			if now.Value == Nickname {
-				RoomStateEmbed.Fields[index].Name = ":x:"
+				RoomStateEmbed.Fields[index].Name = "❌"
 				RoomStateEmbed.Fields[index].Value = "공석"
 				break
 			}
 		}
-
 	} else {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -177,12 +169,20 @@ func Standup(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		})
 	}
 
-	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+	UpdateRoomState(s, i)
+}
+
+// Update Room State latest and disable buttons including action row.
+func UpdateRoomState(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseUpdateMessage,
 		Data: &discordgo.InteractionResponseData{
 			Embeds: []*discordgo.MessageEmbed{RoomStateEmbed},
 		},
 	})
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+	}
 }
 
 func CheckSeatState(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -213,9 +213,9 @@ func CheckSeatState(s *discordgo.Session, i *discordgo.InteractionCreate) {
 						discordgo.Button{
 							Label:    "Exit",
 							Style:    discordgo.DangerButton,
-							CustomID: "exit_btn",
+							CustomID: "X_btn",
 							Emoji: discordgo.ComponentEmoji{
-								Name: "❌",
+								Name: "✖️",
 							},
 						},
 					},
@@ -225,7 +225,6 @@ func CheckSeatState(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	})
 
 	if err != nil {
-		fmt.Println("error response", err)
-		return
+		fmt.Printf("err: %v\n", err)
 	}
 }

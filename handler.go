@@ -24,6 +24,8 @@ func InteractionHandler(s *discordgo.Session, i *discordgo.InteractionCreate) { 
 			service.TakeaSeat(s, i)
 		case "standup_btn":
 			service.Standup(s, i)
+		case "X_btn":
+			service.UpdateRoomState(s,i)
 		}
 	}
 }

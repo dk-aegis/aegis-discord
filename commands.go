@@ -31,7 +31,7 @@ var commands = []*discordgo.ApplicationCommand{
 	//동방에 사람이 얼마나 있는지 확인하는 명령어
 	{
 		Name:        "좌석상황",
-		Description: "현재 동아리방의 좌석 상황을 보여줍니다",
+		Description: "현재 동아리방의 좌석 상황을 보여줍니다. 버튼으로 상호작용 가능합니다.",
 	},
 
 
