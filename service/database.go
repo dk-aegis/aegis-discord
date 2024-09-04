@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+
+	//"golang.org/x/text/date"
 )
 
 var db *sql.DB
@@ -44,99 +46,49 @@ func InitDatabase() error {
 	return nil
 }
 
-type userinfo struct {
-	AccountID string
-	RegistDay string
-}
+//에러 처리코드는 나중에 작성 
 
-func LoadAccount(hashed_id string) (userinfo, error) {
-	query := "SELECT user_id, regist_day FROM account WHERE acc_id = ?"
-	var info userinfo
+type Attendance struct {
+	Id string
+	Attend_count int
+	Lastseen	string
+	Conseq_count int
+}	
 
-	err := db.QueryRow(query, hashed_id).Scan(&info.AccountID, &info.RegistDay)
-	if err != nil {
-		return userinfo{}, err
+func LoadAttendance(userID string) (Attendance, error) {
+
+	query := "SELECT attend_count, last_seen conseq_count FROM attendance WHERE attend_id = ?"
+	info := Attendance{
+		Id: userID,	
 	}
 
-	return info, nil
-
-}
-
-type attendance struct {
-	attendacne int
-	lastseen   string
-}
-
-func LoadAttendance(hashed_id string) (attendance, error) {
-
-	query := "SELECT attend_count, last_seen FROM attendance WHERE attend_id = ?"
-	var info attendance
-
-	err := db.QueryRow(query, hashed_id).Scan(&info.attendacne, &info.lastseen)
+	err := db.QueryRow(query, userID).Scan(&info.Attend_count, &info.Lastseen, &info.Conseq_count)
 	if err != nil {
-		return attendance{}, err
-	}
-
-	return info, nil
-
-}
-
-type players struct {
-	money int
-	exp   int
-}
-
-func LoadPlayers(hashed_id string) (players, error) {
-	query := "SELECT money,exp FROM players WHERE player_id = ?"
-	var info players
-
-	err := db.QueryRow(query, hashed_id).Scan(&info.money, &info.exp)
-	if err != nil {
-		return players{}, err
-	}
-
-	return info, nil
-
-}
-
-type notice struct {
-	id        int
-	fromdate  string
-	untildate string
-	title     string
-	content   string
-	url       string
-}
-
-func LoadNotice(hashed_id string) (notice, error) {
-	query := "SELECT notice_id,fromdate,untildate,title,content FROM notice WHERE ?"
-	var info notice
-
-	err := db.QueryRow(query, hashed_id).Scan(&info.id, &info.fromdate, &info.untildate, &info.title, &info.content, &info.url)
-	if err != nil {
-		return notice{}, err
+		return Attendance{}, err
 	}
 
 	return info, nil
 }
 
-func CheckAdmin(hashed_id string) (bool, error) {
-	query := "SELECT COUNT(*) FROM root WHERE admin_id = ?"
-
-	var count int
-
-	err := db.QueryRow(query, hashed_id).Scan(&count)
-	if err != nil {
-		fmt.Println("관리자 인증 오류 발생")
-		return false, err
-	}
-
-	if count != 0 {
-		return true, nil
-	} else {
-		return false, nil
-	}
+type Players struct {
+	Id 	string
+	Money int
+	Exp   int
 }
+
+func LoadPlayers(userID string) (Players, error) {
+	query := "SELECT money,exp FROM players WHERE id = ?"
+	info := Players{
+		Id: userID,
+	}
+
+	err := db.QueryRow(query, userID).Scan(&info.Money, &info.Exp)
+	if err != nil {
+		return Players{}, err
+	}
+	return info, nil
+}
+
 
 func DBclose() {
 	db.Close()

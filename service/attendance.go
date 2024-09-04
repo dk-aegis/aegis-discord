@@ -7,13 +7,14 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func Attendance(s *discordgo.Session, m *discordgo.MessageCreate) {
-	hashString := Hashstring(m.Author.ID)
-	at, err := LoadAttendance(hashString)
+func DoAttendance(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	userID := i.Member.User.ID
+
+	at, err := LoadAttendance(userID)
 	if err != nil {
 		fmt.Println(err)
 		msg := "출석에 문제가 생겼어요!"
-		s.ChannelMessageSend(m.ChannelID, msg)
+		s.ChannelMessageSend(i.ChannelID, msg)
 		return
 	}
 
@@ -22,7 +23,7 @@ func Attendance(s *discordgo.Session, m *discordgo.MessageCreate) {
 	SET attend_count = attend_count + 1, last_seen = CURRENT_DATE
 	WHERE attend_id = ? AND ? != CURRENT_DATE`
 
-	sqlresult, err := db.Exec(query, hashString, at.lastseen)
+	sqlresult, err := db.Exec(query, userID, at.Lastseen)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -45,23 +46,22 @@ func Attendance(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	err = GiveMoney(hashString, 1000)
+	err = GiveMoney(userID, 1000)
 	if err != nil {
 		fmt.Println("money 지급에 문제가 생겼어요")
 		return
 	}
 
-	err = GiveExp(hashString, 10)
+	err = GiveExp(userID, 25)
 	if err != nil {
 		fmt.Println("exp 지급에 문제가 생겼어요")
 		return
 	}
 
 	msg := "출석처리완료"
-	_, err = s.ChannelMessageSend(m.ChannelID, msg)
+	_, err = s.ChannelMessageSend(i.ChannelID, msg)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-
 }
