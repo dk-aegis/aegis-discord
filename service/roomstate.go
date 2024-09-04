@@ -1,5 +1,6 @@
 package service
 
+//그냥 이름으로만 하게 해뒀는데 동명이인 issue 는 해결 안함...
 import (
 	"fmt"
 	"regexp"
@@ -21,59 +22,95 @@ import (
 
 */
 
-var RoomStateEmbed *discordgo.MessageEmbed = &discordgo.MessageEmbed{
-	Title:       "현재 좌석 상황",
-	Description: "",
-	Color:       0x00ff00,
-	//임베드 메세지의 필드로서 자리는 한 9개 정도 해놓음.
-	Fields: []*discordgo.MessageEmbedField{
-		{
-			Name:   "❌",
-			Value:  "공석",
-			Inline: true,
+var (
+	roomStateEmbed *discordgo.MessageEmbed = &discordgo.MessageEmbed{
+		Title:       "현재 좌석 상황",
+		Description: "",
+		Color:       0x00ff00,
+		//임베드 메세지의 필드로서 자리는 한 9개 정도 해놓음.
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:   "❌",
+				Value:  "공석",
+				Inline: true,
+			},
+			{
+				Name:   "❌",
+				Value:  "공석",
+				Inline: true,
+			},
+			{
+				Name:   "❌",
+				Value:  "공석",
+				Inline: true,
+			},
+			{
+				Name:   "❌",
+				Value:  "공석",
+				Inline: true,
+			},
+			{
+				Name:   "❌",
+				Value:  "공석",
+				Inline: true,
+			},
+			{
+				Name:   "❌",
+				Value:  "공석",
+				Inline: true,
+			},
+			{
+				Name:   "❌",
+				Value:  "공석",
+				Inline: true,
+			},
+			{
+				Name:   "❌",
+				Value:  "공석",
+				Inline: true,
+			},
+			{
+				Name:   "❌",
+				Value:  "공석",
+				Inline: true,
+			},
 		},
-		{
-			Name:   "❌",
-			Value:  "공석",
-			Inline: true,
+	}
+
+	roomState = &discordgo.InteractionResponseData{
+		Embeds: []*discordgo.MessageEmbed{roomStateEmbed},
+		Components: []discordgo.MessageComponent{
+			discordgo.ActionsRow{
+				Components: []discordgo.MessageComponent{
+					discordgo.Button{
+						Label:    "착석",
+						Style:    discordgo.SuccessButton,
+						CustomID: "sitdown_btn",
+						Emoji: discordgo.ComponentEmoji{
+							Name: "🧘", // Unicode 이모지가 들어가야함 window + . 으로 하는 이모지만 들어갈 수 있음 :x: 이런식이면 에러남.
+						},
+					},
+					discordgo.Button{
+						Label:    "기립",
+						Style:    discordgo.DangerButton,
+						CustomID: "standup_btn",
+						Emoji: discordgo.ComponentEmoji{
+							Name: "🏃",
+						},
+					},
+					discordgo.Button{
+						Label:    "Update",
+						Style:    discordgo.PrimaryButton,
+						CustomID: "update_btn",
+						Emoji: discordgo.ComponentEmoji{
+							Name: "😒",
+						},
+					},
+				},
+			},
 		},
-		{
-			Name:   "❌",
-			Value:  "공석",
-			Inline: true,
-		},
-		{
-			Name:   "❌",
-			Value:  "공석",
-			Inline: true,
-		},
-		{
-			Name:   "❌",
-			Value:  "공석",
-			Inline: true,
-		},
-		{
-			Name:   "❌",
-			Value:  "공석",
-			Inline: true,
-		},
-		{
-			Name:   "❌",
-			Value:  "공석",
-			Inline: true,
-		},
-		{
-			Name:   "❌",
-			Value:  "공석",
-			Inline: true,
-		},
-		{
-			Name:   "❌",
-			Value:  "공석",
-			Inline: true,
-		},
-	},
-}
+	}
+)
 
 func countEmpty(table []*discordgo.MessageEmbedField) int {
 	var count int = 0
@@ -108,11 +145,12 @@ func TakeaSeat(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	Nickname := sliceName(i.Member.Nick)
 
-	if countEmpty(RoomStateEmbed.Fields) <= 0 { //빈자리 없다!
+	if countEmpty(roomStateEmbed.Fields) <= 0 { //빈자리 없다!
 		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: "빈 좌석이 없어요",
+				Flags:   discordgo.MessageFlagsEphemeral,
 			},
 		})
 		if err != nil {
@@ -121,11 +159,12 @@ func TakeaSeat(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	if existOnTable(RoomStateEmbed.Fields, Nickname) {
+	if existOnTable(roomStateEmbed.Fields, Nickname) {
 		err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: "이미 좌석을 차지하고 계십니다",
+				Flags:   discordgo.MessageFlagsEphemeral,
 			},
 		})
 		if err != nil {
@@ -135,40 +174,40 @@ func TakeaSeat(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	}
 
 	//상태 바꿈
-	for index, now := range RoomStateEmbed.Fields {
+	for index, now := range roomStateEmbed.Fields {
 		if now.Name == "❌" {
-			RoomStateEmbed.Fields[index].Name = "✅"
-			RoomStateEmbed.Fields[index].Value = Nickname
+			roomStateEmbed.Fields[index].Name = "✅"
+			roomStateEmbed.Fields[index].Value = Nickname
 			break
 		}
 	}
-
 	UpdateRoomState(s, i)
-
 }
 
 func Standup(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	Nickname := sliceName(i.Member.Nick)
 
-	if existOnTable(RoomStateEmbed.Fields, Nickname) {
+	if existOnTable(roomStateEmbed.Fields, Nickname) {
 
-		for index, now := range RoomStateEmbed.Fields {
+		for index, now := range roomStateEmbed.Fields {
 			if now.Value == Nickname {
-				RoomStateEmbed.Fields[index].Name = "❌"
-				RoomStateEmbed.Fields[index].Value = "공석"
+				roomStateEmbed.Fields[index].Name = "❌"
+				roomStateEmbed.Fields[index].Value = "공석"
 				break
 			}
 		}
+
 	} else {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "좌석에 없습니다",
+				Content: "좌석에 존재하지 않으십니다",
+				Flags:   discordgo.MessageFlagsEphemeral,
 			},
 		})
+		return
 	}
-
 	UpdateRoomState(s, i)
 }
 
@@ -176,9 +215,7 @@ func Standup(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func UpdateRoomState(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseUpdateMessage,
-		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{RoomStateEmbed},
-		},
+		Data: roomState,
 	})
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
@@ -189,39 +226,7 @@ func CheckSeatState(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{RoomStateEmbed},
-			Components: []discordgo.MessageComponent{
-				discordgo.ActionsRow{
-					Components: []discordgo.MessageComponent{
-						discordgo.Button{
-							Label:    "착석",
-							Style:    discordgo.SuccessButton,
-							CustomID: "sitdown_btn",
-							Emoji: discordgo.ComponentEmoji{
-								Name: "🧘", // Unicode 이모지가 들어가야함 window + . 으로 하는 이모지만 들어갈 수 있음 :x: 이런식이면 에러남.
-							},
-						},
-						discordgo.Button{
-							Label:    "기립",
-							Style:    discordgo.DangerButton,
-							CustomID: "standup_btn",
-							Emoji: discordgo.ComponentEmoji{
-								Name: "🏃",
-							},
-						},
-						discordgo.Button{
-							Label:    "Exit",
-							Style:    discordgo.DangerButton,
-							CustomID: "X_btn",
-							Emoji: discordgo.ComponentEmoji{
-								Name: "✖️",
-							},
-						},
-					},
-				},
-			},
-		},
+		Data: roomState,
 	})
 
 	if err != nil {
