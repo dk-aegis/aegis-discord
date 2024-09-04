@@ -48,13 +48,12 @@ func main() {
 		fmt.Println("error creating Discord session,", err)
 		return
 	}
-/*
+
 	err = service.InitDatabase() //DB on
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-		*/
 
 	err = global.InitDiscordConfig() //config file on
 	if err != nil {
@@ -65,9 +64,8 @@ func main() {
 	// Register the messageCreate func as a callback for MessageCreate events.
 	//AddHandler 는 인자가 2개인 함수를 인자로 받음. 첫번째는 세션, 두번째는 이벤트...
 
-	
-	dg.AddHandler(InteractionHandler)
 
+	dg.AddHandler(InteractionHandler)
 	dg.AddHandler(messageCreate)
 	dg.AddHandler(service.MemberJoin)
 
@@ -101,6 +99,6 @@ func main() {
 
 	// Cleanly close down the Discord session.
 	dg.Close()
-	
-	//service.DBclose()
+
+	service.DBclose()
 }

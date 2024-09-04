@@ -32,7 +32,5 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go service.CheckExp(s, m)
 	} else if m.Content == "!출석일수" {
 		go service.Checkattend(s, m)
-	} else if m.Content == "!이벤트 목록" {
-		go service.ShowEventLists(s, m)
 	}
 }

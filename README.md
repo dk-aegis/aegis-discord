@@ -46,13 +46,24 @@ you need three config files under config folder
 #### ./config/token.json
 ```json
 {
-    "token" : "token value"
+    "token" : "token value",
+    "guild_id" : "1223177363722862612"
 }
 ```
 
+```
+db 생긴거
+mysql 
+discord
+|
+ㄴTables
+ |
+ ㄴattendacne     id attend_count last_seen conseq_count
+ ㄴwallet         id money exp
+```
 ## 요구사항 
-### Leveling System   check
+### 
 
-### Welcome System    check
+### 
 
-### Attendance System check
+### 
