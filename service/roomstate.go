@@ -86,7 +86,7 @@ var (
 						Label:    "착석",
 						Style:    discordgo.SuccessButton,
 						CustomID: "sitdown_btn",
-						Emoji: discordgo.ComponentEmoji{
+						Emoji: &discordgo.ComponentEmoji{
 							Name: "🧘", // Unicode 이모지가 들어가야함 window + . 으로 하는 이모지만 들어갈 수 있음 :x: 이런식이면 에러남.
 						},
 					},
@@ -94,7 +94,7 @@ var (
 						Label:    "기립",
 						Style:    discordgo.DangerButton,
 						CustomID: "standup_btn",
-						Emoji: discordgo.ComponentEmoji{
+						Emoji: &discordgo.ComponentEmoji{
 							Name: "🏃",
 						},
 					},
@@ -102,7 +102,7 @@ var (
 						Label:    "Update",
 						Style:    discordgo.PrimaryButton,
 						CustomID: "update_btn",
-						Emoji: discordgo.ComponentEmoji{
+						Emoji: &discordgo.ComponentEmoji{
 							Name: "😒",
 						},
 					},

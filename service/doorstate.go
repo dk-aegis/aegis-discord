@@ -27,7 +27,7 @@ var (
 						Label:    "열기",
 						Style:    discordgo.SuccessButton,
 						CustomID: "opendoor_btn",
-						Emoji: discordgo.ComponentEmoji{
+						Emoji: &discordgo.ComponentEmoji{
 							Name: "⚜️", //
 						},
 					},
@@ -35,7 +35,7 @@ var (
 						Label:    "닫기",
 						Style:    discordgo.DangerButton,
 						CustomID: "closedoor_btn",
-						Emoji: discordgo.ComponentEmoji{
+						Emoji: &discordgo.ComponentEmoji{
 							Name: "🚪",
 						},
 					},
