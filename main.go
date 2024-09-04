@@ -64,7 +64,6 @@ func main() {
 	// Register the messageCreate func as a callback for MessageCreate events.
 	//AddHandler 는 인자가 2개인 함수를 인자로 받음. 첫번째는 세션, 두번째는 이벤트...
 
-
 	dg.AddHandler(InteractionHandler)
 	dg.AddHandler(messageCreate)
 	dg.AddHandler(service.MemberJoin)
