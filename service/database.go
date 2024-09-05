@@ -57,13 +57,14 @@ type Attendance struct {
 
 func LoadAttendance(userID string) (Attendance, error) {
 
-	query := "SELECT attend_count, last_seen conseq_count FROM attendance WHERE attend_id = ?"
+	query := "SELECT attend_count, last_seen, conseq_count FROM attendance WHERE id = ?"
 	info := Attendance{
 		Id: userID,	
 	}
 
 	err := db.QueryRow(query, userID).Scan(&info.Attend_count, &info.Lastseen, &info.Conseq_count)
 	if err != nil {
+		fmt.Printf("err: %v\n", err)
 		return Attendance{}, err
 	}
 
@@ -77,7 +78,7 @@ type Wallet struct {
 }
 
 func LoadWallet(userID string) (Wallet, error) {
-	query := "SELECT money,exp FROM players WHERE id = ?"
+	query := "SELECT money, exp FROM wallet WHERE id = ?"
 	info := Wallet{
 		Id: userID,
 	}

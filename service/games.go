@@ -85,7 +85,7 @@ func Slotmachine(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if slot4 == slot5 && slot5 == slot6 {
 		SendInteractionMessage(s,i,"잭팟! (money += 5000)")
 
-		err = GiveMoney(userID, 5000)
+		err = GiveMoneyExp(userID, 5000,1)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -93,7 +93,7 @@ func Slotmachine(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	} else {
 		SendInteractionMessage(s,i,"실패! (money -= 10)")
 
-		err = GiveMoney(userID, -10)
+		err = GiveMoneyExp(userID, -10,1)
 		if err != nil {
 			fmt.Println(err)
 			return

@@ -30,6 +30,14 @@ func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 }
 
 func ForkallGuild(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+
+	if !CheckRole(i.Member.Roles,global.Discord.ModeratorRoleID) {
+		SendInteractionMessage(s,i,"권한이 없습니다")
+		return
+	}
+
+
 	MemList, err := s.GuildMembers(i.GuildID, "", 1000)
 
 	if err != nil {

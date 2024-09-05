@@ -6,35 +6,19 @@ import (
 
 )
 
+func GiveMoneyExp(userID string, money int, exp int) error { //돈주는함수
 
-func GiveMoney(userID string, money int) error { //돈주는함수
+	query := `UPDATE wallet
+	SET money = money + ?,
+	exp = exp + ?
+	WHERE id = ?`
 
-	query := `UPDATE players
-	SET money = money + ?
-	WHERE player_id = ?`
-
-	_, err := db.Exec(query, money, userID)
-
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	return nil
-}
-
-func GiveExp(hashString string, exp int) error {
-
-	query := `UPDATE players
-	SET exp = exp + ?
-	WHERE player_id = ?`
-
-	_, err := db.Exec(query, exp, hashString)
+	_ , err := db.Exec(query, money, exp, userID)
 
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-
 	return nil
 }
+

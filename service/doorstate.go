@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"discord/global"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -76,6 +77,11 @@ func ClosetheDoor(s *discordgo.Session, i *discordgo.InteractionCreate) {
 }
 
 func CreateDoor(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+	if !CheckRole(i.Member.Roles, global.Discord.ModeratorRoleID) {
+		SendInteractionMessage(s,i,"권한이 없습니다")
+		return
+	}
 
 	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
