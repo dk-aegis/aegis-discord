@@ -21,7 +21,7 @@ package main
 
 
 			{
-		
+
 		Name:        "ping",
 		Description: "Responds with pong",
 	},
@@ -59,26 +59,24 @@ var commands = []*discordgo.ApplicationCommand{
 		Description: "문을 등록합니다",
 	},
 	{
-		Name: "출석",
+		Name:        "출석",
 		Description: "출석합니다",
 	},
 	{
-		Name: "사용자 등록",
+		Name:        "사용자등록",
 		Description: "사용자 전부 db에 올리기",
 	},
 	{
-		Name: "슬롯머신",
+		Name:        "슬롯머신",
 		Description: "슬롯머신을 돌립니다 돈 10원이 필요합니다.",
 	},
 }
 
-
-
 var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-	"help": service.HelpMessage,
-	"좌석상황": service.CheckSeatState,
-	"문등록":  service.CreateDoor,
-	"출석": service.DoAttendance,
-	"사용자 등록": service.ForkallGuild,
-	"슬롯머신": service.Slotmachine,
+	"help":  service.HelpMessage,
+	"좌석상황":  service.CheckSeatState,
+	"문등록":   service.CreateDoor,
+	"출석":    service.DoAttendance,
+	"사용자등록": service.ForkallGuild, //스페이스 들어가면 안됨
+	"슬롯머신":  service.Slotmachine,
 }
