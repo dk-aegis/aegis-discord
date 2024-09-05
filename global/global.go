@@ -13,7 +13,6 @@ type DiscordConfig struct {
 	GraduateRoleID    string `json:"graduate_role_id"`
 	StudentRoleID     string `json:"student_role_id"`
 	GeneralRoleID     string `json:"general_role_id"`
-	ExcutivePrivilege string `json:"executive_privilege"`
 }
 
 var Discord DiscordConfig

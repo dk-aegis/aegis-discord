@@ -1,42 +1,68 @@
 package service
 
 import (
+	"discord/global"
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
 )
 
+func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
+
+	msg := fmt.Sprintf("Welcome To Aegis Server <@%s>!", m.User.ID) 
+	_, err := s.ChannelMessageSend(global.Discord.WelcomeChannelID, msg)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = s.GuildMemberRoleAdd(global.Discord.GuildID, m.User.ID, global.Discord.StudentRoleID)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = Regist_user(s,m.User.ID)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
 func ForkallGuild(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	MemList, err := s.GuildMembers(i.GuildID, "", 1000)
 
 	if err != nil {
-		fmt.Printf("err: %v\n", err)     
+		fmt.Printf("err: %v\n", err)
 	}
 
 	for _, member := range MemList {
-		fmt.Println(member.Nick)
+		err := Regist_user(s, member.User.ID)
+
+		if err != nil {
+			fmt.Printf("err: %v\n", err)
+			return
+		}
+		fmt.Println("success ", member.Nick)
 	}
-
-	
-
 }
 
 // user ID 를 받아서 db 에 등록합니다.
 func Regist_user(s *discordgo.Session, userID string) error {
 
-	ta, err := db.Begin() //transaction on.
+	tx, err := db.Begin() //transaction on.
 
 	if err != nil {
-		ta.Rollback()
+		tx.Rollback()
 		fmt.Println(err)
 		return err
 	}
 
 	var count int
 	query := `SELECT COUNT(*) 
-	FROM account 
-	WHERE user_id = ?`
-	err = ta.QueryRow(query, userID).Scan(&count)
+	FROM attendance 
+	WHERE id = ?` 
+	err = tx.QueryRow(query, userID).Scan(&count)
 
 	if err != nil {
 		fmt.Println(err)
@@ -44,36 +70,30 @@ func Regist_user(s *discordgo.Session, userID string) error {
 	}
 
 	if count != 0 {
-		ta.Rollback()
-
-
+		tx.Rollback()
+		fmt.Println("이미 등록된 회원.",userID)
 	}
 
-	wallet_query := "INSERT INTO wallet (player_id,exp,money) VALUES (?,0,10000)"
-	attend_query := "INSERT INTO attendance (attend_id,attend_count,last_seen) VALUES (?,1,CURRENT_DATE)"
+	wallet_query := "INSERT INTO wallet (id,money,exp) VALUES (?,10000,0)"
+	attend_query := "INSERT INTO attendance (id,attend_count,last_seen,conseq_count) VALUES (?,1,CURRENT_DATE,1)"
 
-	_, err = ta.Exec(attend_query, userID)
+	_, err = tx.Exec(attend_query, userID)
 	if err != nil {
-		ta.Rollback()
+		tx.Rollback()
 		fmt.Println(err)
 		return err
 	}
 
-	_, err = ta.Exec(wallet_query, userID)
+	_, err = tx.Exec(wallet_query, userID)
 	if err != nil {
-		ta.Rollback()
+		tx.Rollback()
 		fmt.Println(err)
 		return err
 	}
 
-	err = ta.Commit()
+	err = tx.Commit()
 	if err != nil {
-		ta.Rollback()
-		fmt.Println(err)
-		return err
-	}
-
-	if err != nil {
+		tx.Rollback()
 		fmt.Println(err)
 		return err
 	}

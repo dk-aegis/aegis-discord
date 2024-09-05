@@ -63,7 +63,7 @@ var commands = []*discordgo.ApplicationCommand{
 		Description: "출석합니다",
 	},
 	{
-		Name:        "사용자등록",
+		Name:        "사용자등록",  //명령어 이름에 스페이스 들어가면 안됨
 		Description: "사용자 전부 db에 올리기",
 	},
 	{
@@ -77,6 +77,6 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 	"좌석상황":  service.CheckSeatState,
 	"문등록":   service.CreateDoor,
 	"출석":    service.DoAttendance,
-	"사용자등록": service.ForkallGuild, //스페이스 들어가면 안됨
+	"사용자등록": service.ForkallGuild, 
 	"슬롯머신":  service.Slotmachine,
 }
