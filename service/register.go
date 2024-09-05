@@ -7,13 +7,18 @@ import (
 )
 
 func ForkallGuild(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	Mem, err := s.GuildMembers(i.GuildID, "", 1000)
+	MemList, err := s.GuildMembers(i.GuildID, "", 1000)
+
 	if err != nil {
-		fmt.Printf("err: %v\n", err)
+		fmt.Printf("err: %v\n", err)     
 	}
-	for _, member := range Mem {
+
+	for _, member := range MemList {
 		fmt.Println(member.Nick)
 	}
+
+	
+
 }
 
 // user ID 를 받아서 db 에 등록합니다.
@@ -41,10 +46,6 @@ func Regist_user(s *discordgo.Session, userID string) error {
 	if count != 0 {
 		ta.Rollback()
 
-		if err != nil {
-			fmt.Println("이미 등록된 유저입니다.")
-			return err
-		}
 
 	}
 

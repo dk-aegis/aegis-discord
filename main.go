@@ -87,7 +87,7 @@ func main() {
 		}
 	}
 
-	dg.UpdateWatchStatus(1, "/도움말") //디코봇 상태 메세지 설정
+	dg.UpdateWatchStatus(1, "/help ") //디코봇 상태 메세지 설정
 
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
