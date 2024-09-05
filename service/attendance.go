@@ -11,6 +11,7 @@ func DoAttendance(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	userID := i.Member.User.ID
 
 	at, err := LoadAttendance(userID)
+
 	if err != nil {
 		fmt.Println(err)
 		msg := "출석에 문제가 생겼어요!"
@@ -37,7 +38,7 @@ func DoAttendance(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	if update == 0 {
 		msg := "이미 출석을 하셨습니다."
-		_, err = s.ChannelMessageSend(m.ChannelID, msg)
+		_, err = s.ChannelMessageSend(i.ChannelID, msg)
 		if err != nil {
 			fmt.Println(err)
 			return

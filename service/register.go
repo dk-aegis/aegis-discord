@@ -6,7 +6,17 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-//user ID 를 받아서 db 에 등록합니다.
+func ForkallGuild(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	Mem, err := s.GuildMembers(i.GuildID, "", 1000)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+	}
+	for _, member := range Mem {
+		fmt.Println(member.Nick)
+	}
+}
+
+// user ID 를 받아서 db 에 등록합니다.
 func Regist_user(s *discordgo.Session, userID string) error {
 
 	ta, err := db.Begin() //transaction on.
@@ -38,7 +48,6 @@ func Regist_user(s *discordgo.Session, userID string) error {
 
 	}
 
-	
 	wallet_query := "INSERT INTO wallet (player_id,exp,money) VALUES (?,0,10000)"
 	attend_query := "INSERT INTO attendance (attend_id,attend_count,last_seen) VALUES (?,1,CURRENT_DATE)"
 
@@ -49,7 +58,7 @@ func Regist_user(s *discordgo.Session, userID string) error {
 		return err
 	}
 
-	_, err = ta.Exec(wallet_query,userID)
+	_, err = ta.Exec(wallet_query, userID)
 	if err != nil {
 		ta.Rollback()
 		fmt.Println(err)

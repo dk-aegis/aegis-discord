@@ -70,21 +70,21 @@ func LoadAttendance(userID string) (Attendance, error) {
 	return info, nil
 }
 
-type Players struct {
+type Wallet struct {
 	Id 	string
 	Money int
 	Exp   int
 }
 
-func LoadPlayers(userID string) (Players, error) {
+func LoadWallet(userID string) (Wallet, error) {
 	query := "SELECT money,exp FROM players WHERE id = ?"
-	info := Players{
+	info := Wallet{
 		Id: userID,
 	}
 
 	err := db.QueryRow(query, userID).Scan(&info.Money, &info.Exp)
 	if err != nil {
-		return Players{}, err
+		return Wallet{}, err
 	}
 	return info, nil
 }
