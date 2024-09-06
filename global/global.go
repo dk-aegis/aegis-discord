@@ -3,6 +3,8 @@ package global
 import (
 	"encoding/json"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type DiscordConfig struct {
@@ -15,18 +17,14 @@ type DiscordConfig struct {
 	GeneralRoleID     string `json:"general_role_id"`
 }
 
-var Discord DiscordConfig
+var Config DiscordConfig
 
 func InitDiscordConfig() error {
-	file, err := os.Open("./config/discord.json")
+	err := godotenv.Load()
 	if err != nil {
 		return err
 	}
 
-	defer file.Close()
-
-	jsonParser := json.NewDecoder(file)
-	jsonParser.Decode(&Discord)
 
 	return nil
 }

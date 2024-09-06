@@ -15,7 +15,35 @@ go build
 ```
 
 ## Config FILE
-you need three config files under config folder
+create .env file to manage configuration
+#### .env
+```
+#bot config
+BOT_TOKEN = 봇의 토큰
+BOT_ID = 봇의 ID
+
+#db config
+DB_TYPE = mysql
+DB_USER = username
+DB_PSWD = password
+DB_PROTOCOL = tcp
+DB_PORT = 3306
+DB_HOST = 127.0.0.1
+DB_NAME = database's name
+
+#guild ID
+GUILD_ID = 서버의 ID
+
+#channel ID
+WELCOME_CHAN_ID = 환영인사 보낼 채널 ID
+
+#role ID
+MODROLE_ID = 봇의 특정 명령을 실행시킬 수 있는 권한을 가진 역할 ID (운영진)
+STUDYROLE_ID = 스터디 관련된 역할 ID
+GRADUROLE_ID = 졸업생 ID
+STUDENTROLE_ID = 재학생 ID
+
+```
 #### ./config/db_config.json
 ```json
 {
@@ -34,11 +62,10 @@ you need three config files under config folder
 {
     "guild_id" : "guild id",
     "welcome_channel_id" : "welcome channle id",
-    "moderator_role_id" : "role id",
-	"study_role_id"     : "role id",
-	"graduate_role_id"  : "role id",
-	"student_role_id"   : "role id",
-    "general_role_id"   : "role id"
+    "moderator_role_id" : "관리자 권한 역할 id",
+	"study_role_id"     : "스터디장 역할 id",
+	"graduate_role_id"  : "졸업생 역할 id",
+	"student_role_id"   : "재학생 역할 id"
 }
 ```
 
