@@ -20,8 +20,7 @@ package main
 	}
 
 
-			{
-
+	{
 		Name:        "ping",
 		Description: "Responds with pong",
 	},
@@ -60,7 +59,7 @@ var commands = []*discordgo.ApplicationCommand{
 
 	{
 		Name:        "슬롯머신",
-		Description: "슬롯머신을 돌립니다 돈 10원이 필요합니다.",
+		Description: "슬롯머신을 돌립니다. 돈 10원이 필요합니다.",
 	},
 	//관리자만 쓸 수 있도록 해야할듯.
 	{
@@ -68,20 +67,21 @@ var commands = []*discordgo.ApplicationCommand{
 		Description: "(권한 필요) 문을 등록합니다",
 	},
 	{
-		Name:        "사용자등록",  //명령어 이름에 스페이스 들어가면 안됨
+		Name:        "사용자등록", //명령어 이름에 스페이스 들어가면 안됨
 		Description: "(권한 필요) 사용자 전부 db에 올리기",
 	},
 	{
-		Name: "정보",
+		Name:        "정보",
 		Description: "유저에 대한 정보를 보여줍니다",
 	},
 }
 
-var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 	"help":  service.HelpMessage,
 	"좌석상황":  service.CheckSeatState,
 	"문등록":   service.CreateDoor,
 	"출석":    service.DoAttendance,
-	"사용자등록": service.ForkallGuild, 
+	"사용자등록": service.ForkallGuild,
 	"슬롯머신":  service.Slotmachine,
+	"정보":    service.ShowUserInfo,
 }
