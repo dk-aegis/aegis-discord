@@ -1,0 +1,28 @@
+
+services:
+
+  discord-bot:
+    build: .
+    container_name: aegis-discord
+    depends_on:
+      - mysql
+    restart: always
+    networks:
+      - aegis-networks  # 네트워크 이름 통일
+    
+  mysql:
+    image: mysql:8.0.37
+    container_name: mysql-db
+    ports:
+      - "3306:3306"  # 공백 수정
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: always
+    networks:
+      - aegis-networks  # 네트워크 이름 통일
+
+volumes:
+  mysql-data:
+
+networks:
+  aegis-networks:  # 네트워크 이름 통일
