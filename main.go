@@ -15,7 +15,6 @@ import (
 
 type TokenConfig struct {
 	Token   string `json:"token"`
-	GuildID string `json:"guild_id"`
 }
 
 func getToken() (TokenConfig, error) {
@@ -37,13 +36,13 @@ func getToken() (TokenConfig, error) {
 func main() {
 
 	// Create a new Discord session using the provided bot token.
-	tc, err := getToken()
+	err := global.InitDiscordConfig() //config file on
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	dg, err := discordgo.New("Bot " + tc.Token) //session 을 생성합니다. 이 session 으로 discordbot 의 동작이나 상태를 관리할 수 있습니다.
+	dg, err := discordgo.New("Bot " + global.Discord.Bot.Token) //session 을 생성합니다. 이 session 으로 discordbot 의 동작이나 상태를 관리할 수 있습니다.
 	if err != nil {
 		fmt.Println("error creating Discord session,", err)
 		return
@@ -55,11 +54,7 @@ func main() {
 		return
 	}
 
-	err = global.InitDiscordConfig() //config file on
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+
 
 	// Register the messageCreate func as a callback for MessageCreate events.
 	//AddHandler 는 인자가 2개인 함수를 인자로 받음. 첫번째는 세션, 두번째는 이벤트...
@@ -79,7 +74,7 @@ func main() {
 
 	fmt.Println("Adding Commands!")
 	for _, cmd := range commands { //cmd가 명령어 같긴 한데.. 뭘 무시하고 cmd 를 받는건지 잘 모르겠네
-		_, err := dg.ApplicationCommandCreate(dg.State.User.ID, tc.GuildID, cmd) //SlashCommands 를 추가합니다. 봇의 ID / 길드ID / 명령어
+		_, err := dg.ApplicationCommandCreate(dg.State.User.ID, global.Discord.GuildID, cmd) //SlashCommands 를 추가합니다. 봇의 ID / 길드ID / 명령어
 		if err != nil {
 			log.Fatalf("Cannot create Command.. Error at : %s", cmd.Name)
 		} else {

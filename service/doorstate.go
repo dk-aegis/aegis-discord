@@ -78,7 +78,7 @@ func ClosetheDoor(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 func CreateDoor(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
-	if !CheckRole(i.Member.Roles, global.Discord.ModeratorRoleID) {
+	if !CheckRole(i.Member.Roles, global.Discord.Role.ModRoleID) {
 		SendInteractionMessage(s,i,"권한이 없습니다")
 		return
 	}

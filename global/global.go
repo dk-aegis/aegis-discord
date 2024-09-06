@@ -1,26 +1,47 @@
 package global
 
 import (
-	"encoding/json"
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
 )
 
-type DiscordConfig struct {
-	GuildID           string `json:"guild_id"`
-	WelcomeChannelID  string `json:"welcome_channel_id"`
-	ModeratorRoleID   string `json:"moderator_role_id"`
-	StudyRoleID       string `json:"study_role_id"`
-	GraduateRoleID    string `json:"graduate_role_id"`
-	StudentRoleID     string `json:"student_role_id"`
-	GeneralRoleID     string `json:"general_role_id"`
+type BotConfig struct {
+	Token string 
+	AppID string 
 }
 
-var Config DiscordConfig
+type DbConfig struct {
+	Type     string
+	User     string
+	Password string
+	Protocol string
+	Port     string
+	Host     string
+	Name     string
+}
+
+type RoleConfig struct {
+	ModRoleID      string
+	StudyRoleID    string
+	GraduateRoleID string
+	StudentRoleID  string
+}
+
+type Config struct {
+	Bot BotConfig
+	DB DbConfig
+	Role RoleConfig
+	GuildID string
+	WelcomeChannelID string
+}
+
+var Discord Config
 
 func InitDiscordConfig() error {
 	err := godotenv.Load()
+	//조금 더 알아보고 환경변수 할당하는 코드 짜기
 	if err != nil {
 		return err
 	}

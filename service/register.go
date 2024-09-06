@@ -9,20 +9,20 @@ import (
 
 func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 
-	msg := fmt.Sprintf("Welcome To Aegis Server <@%s>!", m.User.ID) 
+	msg := fmt.Sprintf("Welcome To Aegis Server <@%s>!", m.User.ID)
 	_, err := s.ChannelMessageSend(global.Discord.WelcomeChannelID, msg)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	err = s.GuildMemberRoleAdd(global.Discord.GuildID, m.User.ID, global.Discord.StudentRoleID)
+	err = s.GuildMemberRoleAdd(global.Discord.GuildID, m.User.ID, global.Discord.Role.StudentRoleID)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	err = Regist_user(s,m.User.ID)
+	err = Regist_user(s, m.User.ID)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -31,12 +31,10 @@ func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 
 func ForkallGuild(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
-
-	if !CheckRole(i.Member.Roles,global.Discord.ModeratorRoleID) {
-		SendInteractionMessage(s,i,"권한이 없습니다")
+	if !CheckRole(i.Member.Roles, global.Discord.Role.ModRoleID) {
+		SendInteractionMessage(s, i, "권한이 없습니다")
 		return
 	}
-
 
 	MemList, err := s.GuildMembers(i.GuildID, "", 1000)
 
@@ -69,7 +67,7 @@ func Regist_user(s *discordgo.Session, userID string) error {
 	var count int
 	query := `SELECT COUNT(*) 
 	FROM attendance 
-	WHERE id = ?` 
+	WHERE id = ?`
 	err = tx.QueryRow(query, userID).Scan(&count)
 
 	if err != nil {
@@ -79,7 +77,7 @@ func Regist_user(s *discordgo.Session, userID string) error {
 
 	if count != 0 {
 		tx.Rollback()
-		fmt.Println("이미 등록된 회원.",userID)
+		fmt.Println("이미 등록된 회원.", userID)
 	}
 
 	wallet_query := "INSERT INTO wallet (id,money,exp) VALUES (?,10000,0)"
