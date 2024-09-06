@@ -34,7 +34,5 @@ func InteractionHandler(s *discordgo.Session, i *discordgo.InteractionCreate) { 
 		case "closedoor_btn":
 			service.ClosetheDoor(s, i)
 		}
-
-
 	}
 }

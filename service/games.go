@@ -8,27 +8,24 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func Slotmachine(s *discordgo.Session, m *discordgo.MessageCreate) {
+func Slotmachine(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
-	hashString := Hashstring(m.Author.ID)
+	userID := i.Member.User.ID
+	
 
-	playermoney, err := LoadPlayers(hashString)
+	playermoney, err := LoadWallet(userID)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	if playermoney.money < 10 {
-		_, err = s.ChannelMessageSend(m.ChannelID, "돈이 부족해요!")
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	if playermoney.Money < 10 {
+		SendInteractionMessage(s,i,"돈이 부족해요")
 		return
 	}
 
-	_, err = s.ChannelMessageSend(m.ChannelID, "**--SLOTS--**")
+	_, err = s.ChannelMessageSend(i.ChannelID, "**--SLOTS--**")
 	if err != nil {
 		fmt.Println("SendMessageError", err)
 		return
@@ -37,8 +34,9 @@ func Slotmachine(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var (
 		slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9 string     = ":white_square_button:", ":white_square_button:", ":white_square_button:", ":white_square_button:", ":white_square_button:", ":white_square_button:", ":white_square_button:", ":white_square_button:", ":white_square_button:"
 		slotlist                                                      [3][10]int //슬롯담을2차원배열
-		message_                                                      *discordgo.Message
+		slot_msg                                                      *discordgo.Message
 	)
+
 	Emojilist := map[int]string{ //슬롯에 나올 이모지들 1번이 당첨.
 		1: ":smile:",
 		2: ":cry:",
@@ -58,7 +56,7 @@ func Slotmachine(s *discordgo.Session, m *discordgo.MessageCreate) {
 %s %s %s :arrow_left:
 %s %s %s
 :white_small_square: :white_small_square: :white_small_square:`, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9)
-	message_, err = s.ChannelMessageSend(m.ChannelID, msg)
+	slot_msg, err = s.ChannelMessageSend(i.ChannelID, msg)
 	if err != nil {
 		fmt.Println("SendMessageError", err)
 		return
@@ -66,16 +64,16 @@ func Slotmachine(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	time.Sleep(time.Second * 2)
 
-	for i := 0; i < 8; i++ {
-		slot1, slot2, slot3 = Emojilist[slotlist[0][i+2]], Emojilist[slotlist[1][i+2]], Emojilist[slotlist[2][i+2]]
-		slot4, slot5, slot6 = Emojilist[slotlist[0][i+1]], Emojilist[slotlist[1][i+1]], Emojilist[slotlist[2][i+1]]
-		slot7, slot8, slot9 = Emojilist[slotlist[0][i]], Emojilist[slotlist[1][i]], Emojilist[slotlist[2][i]]
+	for index := 0; index < 8; index++ {
+		slot1, slot2, slot3 = Emojilist[slotlist[0][index+2]], Emojilist[slotlist[1][index+2]], Emojilist[slotlist[2][index+2]]
+		slot4, slot5, slot6 = Emojilist[slotlist[0][index+1]], Emojilist[slotlist[1][index+1]], Emojilist[slotlist[2][index+1]]
+		slot7, slot8, slot9 = Emojilist[slotlist[0][index]], Emojilist[slotlist[1][index]], Emojilist[slotlist[2][index]]
 		msg := fmt.Sprintf(`:white_small_square: :white_small_square: :white_small_square:
 %s %s %s
 %s %s %s :arrow_left:
 %s %s %s
 :white_small_square: :white_small_square: :white_small_square:`, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9)
-		_, err = s.ChannelMessageEdit(m.ChannelID, message_.ID, msg)
+		_, err = s.ChannelMessageEdit(slot_msg.ChannelID, slot_msg.ID, msg)
 		time.Sleep(time.Millisecond * 300)
 		if err != nil {
 			fmt.Println(err)
@@ -83,31 +81,22 @@ func Slotmachine(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
+	//당첨 조건
 	if slot4 == slot5 && slot5 == slot6 {
-		_, err = s.ChannelMessageSend(m.ChannelID, "잭팟! (money += 5000)")
+		SendInteractionMessage(s,i,"잭팟! (money += 5000)")
+
+		err = GiveMoneyExp(userID, 5000,1)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-
-		err = GiveMoney(hashString, 5000)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
 	} else {
-		_, err = s.ChannelMessageSend(m.ChannelID, "실패! (money -= 10)")
+		SendInteractionMessage(s,i,"실패! (money -= 10)")
+
+		err = GiveMoneyExp(userID, -10,1)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-
-		err = GiveMoney(hashString, -10)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
 	}
 }

@@ -1,109 +1,80 @@
 package service
 
 import (
-	"discord/global"
-
 	"fmt"
+	"strconv"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
-	msg := fmt.Sprintf("Welcome To Aegis Server <@%s>!", m.User.ID)
-	_, err := s.ChannelMessageSend(global.Discord.WelcomeChannelID, msg)
+func ShowUserInfo(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+	At, err := LoadAttendance(i.Member.User.ID)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("err: %v\n", err)
+		return
+	}
+	Wl, err := LoadWallet(i.Member.User.ID)
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
 		return
 	}
 
-	err = s.GuildMemberRoleAdd(global.Discord.GuildID, m.User.ID, global.Discord.StudentRoleID)
+	embed := &discordgo.MessageEmbed{
+		Title: "User Infomation",
+		Color: 0x00ff00,
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:   "money",
+				Value:  strconv.Itoa(Wl.Money),
+				Inline: true,
+			},
+			{
+				Name:   "exp",
+				Value:  strconv.Itoa(Wl.Exp),
+				Inline: true,
+			},
+			{
+				Name:  "출석일수",
+				Value: strconv.Itoa(At.Attend_count),
+			},
+			{
+				Name:  "연속출석일수",
+				Value: strconv.Itoa(At.Conseq_count),
+			},
+			{
+				Name:  "마지막 출석 날짜",
+				Value: At.Lastseen,
+			},
+		},
+	}
+
+	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Embeds: []*discordgo.MessageEmbed{embed},
+		},
+	})
+
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("error response", err)
 		return
 	}
 
 }
 
-func GiveMoney(hashString string, money int) error { //돈주는함수
+func GiveMoneyExp(userID string, money int, exp int) error { //돈주는함수
 
-	query := `UPDATE players
-	SET money = money + ?
-	WHERE player_id = ?`
+	query := `UPDATE wallet
+	SET money = money + ?,
+	exp = exp + ?
+	WHERE id = ?`
 
-	_, err := db.Exec(query, money, hashString)
+	_, err := db.Exec(query, money, exp, userID)
 
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-
 	return nil
-}
-
-func GiveExp(hashString string, exp int) error {
-
-	query := `UPDATE players
-	SET exp = exp + ?
-	WHERE player_id = ?`
-
-	_, err := db.Exec(query, exp, hashString)
-
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	return nil
-}
-
-func CheckMoney(s *discordgo.Session, m *discordgo.MessageCreate) {
-
-	id := m.Author.ID
-	hashString := Hashstring(id)
-	play, err := LoadPlayers(hashString)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	msg := fmt.Sprintf("<@%s>님이 소지중인 money(은)는 %d 입니다!", id, play.money)
-	_, err = s.ChannelMessageSend(m.ChannelID, msg)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-}
-
-func CheckExp(s *discordgo.Session, m *discordgo.MessageCreate) {
-
-	id := m.Author.ID
-	hashString := Hashstring(id)
-	play, err := LoadPlayers(hashString)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	msg := fmt.Sprintf("<@%s>님이 소지중인 exp(은)는 %d 입니다!", id, play.exp)
-	_, err = s.ChannelMessageSend(m.ChannelID, msg)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-}
-
-func Checkattend(s *discordgo.Session, m *discordgo.MessageCreate) {
-
-	id := m.Author.ID
-	hashString := Hashstring(id)
-	att, err := LoadAttendance(hashString)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	msg := fmt.Sprintf("<@%s>님의 출석일수(은)는 %d일 입니다!", id, att.attendacne)
-	_, err = s.ChannelMessageSend(m.ChannelID, msg)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
 }

@@ -1,44 +1,76 @@
 package service
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
+	"discord/global"
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func Hashstring(str string) string { //hasinghasing
-	hash := sha256.Sum256([]byte(str))
-	hashString := hex.EncodeToString(hash[:])
-	return string(hashString)
-}
+func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 
-func Regist_user(s *discordgo.Session, m *discordgo.MessageCreate) error {
-
-	msg := "등록중..."
-	_, err := s.ChannelMessageSend(m.ChannelID, msg)
-
+	msg := fmt.Sprintf("Welcome To Aegis Server <@%s>!", m.User.ID) 
+	_, err := s.ChannelMessageSend(global.Discord.WelcomeChannelID, msg)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return
 	}
 
-	hashString := Hashstring(m.Author.ID)
+	err = s.GuildMemberRoleAdd(global.Discord.GuildID, m.User.ID, global.Discord.StudentRoleID)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	ta, err := db.Begin() //transaction on.
+	err = Regist_user(s,m.User.ID)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func ForkallGuild(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+
+	if !CheckRole(i.Member.Roles,global.Discord.ModeratorRoleID) {
+		SendInteractionMessage(s,i,"권한이 없습니다")
+		return
+	}
+
+
+	MemList, err := s.GuildMembers(i.GuildID, "", 1000)
 
 	if err != nil {
-		ta.Rollback()
+		fmt.Printf("err: %v\n", err)
+	}
+
+	for _, member := range MemList {
+		err := Regist_user(s, member.User.ID)
+
+		if err != nil {
+			fmt.Printf("err: %v\n", err)
+			return
+		}
+		fmt.Println("success ", member.Nick)
+	}
+}
+
+// user ID 를 받아서 db 에 등록합니다.
+func Regist_user(s *discordgo.Session, userID string) error {
+
+	tx, err := db.Begin() //transaction on.
+
+	if err != nil {
+		tx.Rollback()
 		fmt.Println(err)
 		return err
 	}
 
 	var count int
 	query := `SELECT COUNT(*) 
-	FROM account 
-	WHERE user_id = ?`
-	err = ta.QueryRow(query, hashString).Scan(&count)
+	FROM attendance 
+	WHERE id = ?` 
+	err = tx.QueryRow(query, userID).Scan(&count)
 
 	if err != nil {
 		fmt.Println(err)
@@ -46,53 +78,30 @@ func Regist_user(s *discordgo.Session, m *discordgo.MessageCreate) error {
 	}
 
 	if count != 0 {
-		ta.Rollback()
-		msg := "이미 등록되어있습니다."
-		_, err := s.ChannelMessageSend(m.ChannelID, msg)
-
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
-
+		tx.Rollback()
+		fmt.Println("이미 등록된 회원.",userID)
 	}
 
-	acc_query := "INSERT INTO account (user_id, regist_day) VALUES (?,CURRENT_DATE)"
-	play_query := "INSERT INTO players (player_id,exp,money) VALUES (?,0,10000)"
-	attend_query := "INSERT INTO attendance (attend_id,attend_count,last_seen) VALUES (?,1,CURRENT_DATE)"
+	wallet_query := "INSERT INTO wallet (id,money,exp) VALUES (?,10000,0)"
+	attend_query := "INSERT INTO attendance (id,attend_count,last_seen,conseq_count) VALUES (?,1,CURRENT_DATE,1)"
 
-	_, err = ta.Exec(acc_query, hashString)
+	_, err = tx.Exec(attend_query, userID)
 	if err != nil {
-		ta.Rollback()
+		tx.Rollback()
 		fmt.Println(err)
 		return err
 	}
 
-	_, err = ta.Exec(play_query, hashString)
+	_, err = tx.Exec(wallet_query, userID)
 	if err != nil {
-		ta.Rollback()
+		tx.Rollback()
 		fmt.Println(err)
 		return err
 	}
 
-	_, err = ta.Exec(attend_query, hashString)
+	err = tx.Commit()
 	if err != nil {
-		ta.Rollback()
-		fmt.Println(err)
-		return err
-	}
-
-	err = ta.Commit()
-	if err != nil {
-		ta.Rollback()
-		fmt.Println(err)
-		return err
-	}
-
-	msg = "등록완료!"
-	_, err = s.ChannelMessageSend(m.ChannelID, msg)
-
-	if err != nil {
+		tx.Rollback()
 		fmt.Println(err)
 		return err
 	}
