@@ -42,14 +42,15 @@ func ForkallGuild(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		fmt.Printf("err: %v\n", err)
 	}
 
-	for _, member := range MemList {
+	for index, member := range MemList {
 		err := Regist_user(s, member.User.ID)
 
 		if err != nil {
 			fmt.Printf("err: %v\n", err)
-			return
+			continue
 		}
-		fmt.Println("success ", member.Nick)
+		msg := fmt.Sprintf("%d : success %s ", index, member.Nick)
+		fmt.Println(msg)
 	}
 }
 

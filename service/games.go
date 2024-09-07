@@ -23,7 +23,15 @@ func Slotmachine(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if playermoney.Money < 10 {
 		SendInteractionMessage(s,i,"돈이 부족해요")
 		return
+	} else {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Flags:   discordgo.MessageFlagsEphemeral,
+			},
+		})
 	}
+
 
 	_, err = s.ChannelMessageSend(i.ChannelID, "**--SLOTS--**")
 	if err != nil {
@@ -83,7 +91,9 @@ func Slotmachine(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	//당첨 조건
 	if slot4 == slot5 && slot5 == slot6 {
-		SendInteractionMessage(s,i,"잭팟! (money += 5000)")
+		s.FollowupMessageCreate(i.Interaction,true,&discordgo.WebhookParams{
+			Content: "잭팟! (money += 5000)",
+		})
 
 		err = GiveMoneyExp(userID, 5000,1)
 		if err != nil {
@@ -91,7 +101,9 @@ func Slotmachine(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			return
 		}
 	} else {
-		SendInteractionMessage(s,i,"실패! (money -= 10)")
+		s.FollowupMessageCreate(i.Interaction,true,&discordgo.WebhookParams{
+			Content: "실패! (money -= 10)",
+		})
 
 		err = GiveMoneyExp(userID, -10,1)
 		if err != nil {

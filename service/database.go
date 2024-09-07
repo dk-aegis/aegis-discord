@@ -1,43 +1,35 @@
 package service
 
 import (
+	"discord/global"
 	"database/sql"
-	"encoding/json"
-	"fmt"
-	"os"
+	_ "github.com/go-sql-driver/mysql"
 
-	//"golang.org/x/text/date"
+	"fmt"
+
 )
+
+type DbConfig struct {
+	Type     string
+	Host     string
+	Port     string
+	User     string
+	Password string
+	Name     string
+	Protocol string
+}
 
 var db *sql.DB
 
-type DbConfig struct {
-	Type     string `json:"type"`
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	User     string `json:"user"`
-	Password string `json:"password"`
-	Database string `json:"database"`
-	Protocol string `json:"protocol"`
-}	
-
 func InitDatabase() error {
-	var dc DbConfig
-	file, err := os.Open("./config/db_config.json")
+	var dc global.DbConfig  = global.Discord.DB
 
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
+	
 
-	defer file.Close()
+	auth := fmt.Sprintf("%s:%s@%s(%s:%s)/%s",
+		dc.User, dc.Password, dc.Protocol, dc.Host, dc.Port, dc.Name)
 
-	jsonParser := json.NewDecoder(file)
-	jsonParser.Decode(&dc)
-
-	auth := fmt.Sprintf("%s:%s@%s(%s:%d)/%s",
-		dc.User, dc.Password, dc.Protocol, dc.Host, dc.Port, dc.Database)
-
+	var err error
 	db, err = sql.Open(dc.Type, auth)
 	if err != nil {
 		return err
@@ -46,20 +38,20 @@ func InitDatabase() error {
 	return nil
 }
 
-//에러 처리코드는 나중에 작성 
+//에러 처리코드는 나중에 작성
 
 type Attendance struct {
-	Id string
+	Id           string
 	Attend_count int
-	Lastseen	string
+	Lastseen     string
 	Conseq_count int
-}	
+}
 
 func LoadAttendance(userID string) (Attendance, error) {
 
 	query := "SELECT attend_count, last_seen, conseq_count FROM attendance WHERE id = ?"
 	info := Attendance{
-		Id: userID,	
+		Id: userID,
 	}
 
 	err := db.QueryRow(query, userID).Scan(&info.Attend_count, &info.Lastseen, &info.Conseq_count)
@@ -72,7 +64,7 @@ func LoadAttendance(userID string) (Attendance, error) {
 }
 
 type Wallet struct {
-	Id 	string
+	Id    string
 	Money int
 	Exp   int
 }
@@ -89,7 +81,6 @@ func LoadWallet(userID string) (Wallet, error) {
 	}
 	return info, nil
 }
-
 
 func DBclose() {
 	db.Close()
