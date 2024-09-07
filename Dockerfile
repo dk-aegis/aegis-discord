@@ -16,8 +16,5 @@ COPY . .
 # Build the Go binary
 RUN go build -o aegis-discord .
 
-# Expose any necessary ports (optional)
-EXPOSE 8080
-
 # Run the compiled Go binary
 CMD ["/app/aegis-discord"]

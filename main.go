@@ -3,9 +3,9 @@ package main
 import (
 	"discord/global"
 	"discord/service"
-	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,24 +13,9 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-type TokenConfig struct {
-	Token   string `json:"token"`
-}
-
-func getToken() (TokenConfig, error) {
-	var tc TokenConfig
-	file, err := os.Open("./config/token.json")
-
-	if err != nil {
-		return TokenConfig{}, err
-	}
-
-	defer file.Close()
-
-	jsonParser := json.NewDecoder(file)
-	jsonParser.Decode(&tc)
-
-	return tc, nil
+func HealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "OK")
 }
 
 func main() {
@@ -54,7 +39,7 @@ func main() {
 		return
 	}
 
-
+	http.HandleFunc("/health", HealthCheck)
 
 	// Register the messageCreate func as a callback for MessageCreate events.
 	//AddHandler 는 인자가 2개인 함수를 인자로 받음. 첫번째는 세션, 두번째는 이벤트...
