@@ -25,7 +25,7 @@ services:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PSWD}
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     restart: always
