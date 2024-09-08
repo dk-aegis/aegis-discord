@@ -60,7 +60,6 @@ func Regist_user(s *discordgo.Session, userID string) error {
 	tx, err := db.Begin() //transaction on.
 
 	if err != nil {
-		tx.Rollback()
 		fmt.Println(err)
 		return err
 	}

@@ -46,11 +46,6 @@ func InitDiscordConfig() error {
 		log.Fatal("Error loading .env file")
 	}
 
-	Discord.Bot = BotConfig{
-		Token: env["BOT_TOKEN"],
-		AppID: env["BOT_ID"],
-	}
-
 	Discord = Config{
 		Bot: BotConfig{
 			Token: env["BOT_TOKEN"],

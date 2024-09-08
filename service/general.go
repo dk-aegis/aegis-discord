@@ -1,6 +1,7 @@
 package service
 
 import (
+	"discord/global"
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
@@ -22,6 +23,7 @@ func HelpMessage(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		Description: msg,
 		Color:       0x00ff00,
 	}
+	
 
 	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,

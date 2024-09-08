@@ -1,12 +1,12 @@
 package service
 
 import (
-	"discord/global"
 	"database/sql"
+	"discord/global"
+
 	_ "github.com/go-sql-driver/mysql"
 
 	"fmt"
-
 )
 
 type DbConfig struct {
@@ -21,19 +21,59 @@ type DbConfig struct {
 
 var db *sql.DB
 
-func InitDatabase() error {
-	var dc global.DbConfig  = global.Discord.DB
+func CreateDb(db *sql.DB) {
+	_, err := db.Exec("CREATE DATABASE IF NOT EXISTS discord")
+	if err != nil {
+		fmt.Println("DB creat error", err)
+	}
 
-	
+	_, err = db.Exec("USE discord")
+	if err != nil {
+		fmt.Println("DB creat error", err)
+	}
+
+	createAttendTable := `
+	CREATE TABLE IF NOT EXISTS attendance (
+        id VARCHAR(65) NOT NULL,
+        attend_count INT DEFAULT NULL,
+        last_seen DATE DEFAULT NULL,
+        conseq_count INT DEFAULT NULL,
+        PRIMARY KEY (id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+	`
+	_, err = db.Exec(createAttendTable)
+	if err != nil {
+		fmt.Println("DB creat error", err)
+	}
+
+	createWalletTable := `
+	CREATE TABLE IF NOT EXISTS wallet (
+		id VARCHAR(65) NOT NULL,
+		money INT DEFAULT NULL,
+		exp INT DEFAULT NULL,
+		PRIMARY KEY (id)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+	`
+	_, err = db.Exec(createWalletTable)
+	if err != nil {
+		fmt.Println("DB creat error", err)
+	}
+
+}
+
+func InitDatabase() error {
+	var dc global.DbConfig = global.Discord.DB
 
 	auth := fmt.Sprintf("%s:%s@%s(%s:%s)/%s",
-		dc.User, dc.Password, dc.Protocol, dc.Host, dc.Port, dc.Name)
+		dc.User, dc.Password, dc.Protocol, dc.Host, dc.Port, "")
 
 	var err error
 	db, err = sql.Open(dc.Type, auth)
 	if err != nil {
 		return err
 	}
+
+	CreateDb(db)
 
 	return nil
 }
