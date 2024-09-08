@@ -1,7 +1,6 @@
 package service
 
 import (
-	"discord/global"
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
