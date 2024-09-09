@@ -21,7 +21,7 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 5)
 	// Create a new Discord session using the provided bot token.
 	err := global.InitDiscordConfig() //config file on
 	if err != nil {
