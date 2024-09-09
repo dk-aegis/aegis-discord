@@ -21,6 +21,7 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+	//mysql 준비될 때 까지 기다리는건데 개선필요할듯.
 	time.Sleep(time.Second * 10)
 	// Create a new Discord session using the provided bot token.
 	err := global.InitDiscordConfig() //config file on
