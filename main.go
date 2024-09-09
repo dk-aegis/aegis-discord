@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -20,6 +21,7 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+	time.Sleep(time.Second * 2)
 	// Create a new Discord session using the provided bot token.
 	err := global.InitDiscordConfig() //config file on
 	if err != nil {
