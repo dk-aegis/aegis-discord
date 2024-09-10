@@ -60,8 +60,8 @@ func DoAttendance(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		6: "%d일째 출석 성공! 연속 출석 %d일을 달성했습니다!",
 		7: "현재 %d일째 출석 중이고, 연속 출석은 %d일째입니다! 앞으로도 계속 출석하세요!",
 	}
-
-	randm := msglist[rand.Intn(7)]
+	
+	randm := msglist[rand.Intn(7)+1] //범위 잘못 정함. 
 
 	msg := fmt.Sprintf(randm, At.Attend_count, At.Conseq_count)
 	SendInteractionMessage(s, i, msg)

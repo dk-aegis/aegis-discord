@@ -3,11 +3,15 @@ package service
 import (
 	"discord/global"
 	"fmt"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
+
+	//뜸들이기
+	time.Sleep(time.Second * 5)
 
 	msg := fmt.Sprintf("Welcome To Aegis Server <@%s>!", m.User.ID)
 	_, err := s.ChannelMessageSend(global.Discord.WelcomeChannelID, msg)
@@ -44,11 +48,12 @@ func ForkallGuild(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	for index, member := range MemList {
 		err := Regist_user(s, member.User.ID)
-
+	
 		if err != nil {
 			fmt.Printf("err: %v\n", err)
 			continue
 		}
+
 		msg := fmt.Sprintf("%d : success %s ", index, member.Nick)
 		fmt.Println(msg)
 	}

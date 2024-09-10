@@ -1,8 +1,8 @@
 package service
 
 import (
-	"fmt"
 	"discord/global"
+	"fmt"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -64,7 +64,7 @@ func OpentheDoor(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func ClosetheDoor(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	doorState.Embeds[0].Image.URL = closedoor
-	doorState.Embeds[0].Color = 0xa5ea89
+	doorState.Embeds[0].Color = 0xff0000
 
 	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseUpdateMessage,
@@ -79,7 +79,7 @@ func ClosetheDoor(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func CreateDoor(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	if !CheckRole(i.Member.Roles, global.Discord.Role.ModRoleID) {
-		SendInteractionMessage(s,i,"권한이 없습니다")
+		SendInteractionMessage(s, i, "권한이 없습니다")
 		return
 	}
 

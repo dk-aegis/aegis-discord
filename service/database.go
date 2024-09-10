@@ -25,11 +25,13 @@ func CreateDb(db *sql.DB) {
 	_, err := db.Exec("CREATE DATABASE IF NOT EXISTS discord")
 	if err != nil {
 		fmt.Println("DB creat error", err)
+		return
 	}
 
 	_, err = db.Exec("USE discord")
 	if err != nil {
 		fmt.Println("DB creat error", err)
+		return
 	}
 
 	createAttendTable := `
@@ -43,7 +45,7 @@ func CreateDb(db *sql.DB) {
 	`
 	_, err = db.Exec(createAttendTable)
 	if err != nil {
-		fmt.Println("DB creat error", err)
+		fmt.Println("Attend creat error", err)
 	}
 
 	createWalletTable := `
@@ -56,15 +58,17 @@ func CreateDb(db *sql.DB) {
 	`
 	_, err = db.Exec(createWalletTable)
 	if err != nil {
-		fmt.Println("DB creat error", err)
+		fmt.Println("Wallet creat error", err)
 	}
+
+	db.Close() //db 닫아줌
 
 }
 
 func InitDatabase() error {
 	var dc global.DbConfig = global.Discord.DB
 
-	auth := fmt.Sprintf("%s:%s@%s(%s:%s)/",
+	auth := fmt.Sprintf("%s:%s@%s(%s:%s)/",   //데이터베이스 지정하지 않고 접속.
 		dc.User, dc.Password, dc.Protocol, dc.Host, dc.Port)
 
 	var err error
@@ -75,41 +79,13 @@ func InitDatabase() error {
 
 	CreateDb(db)
 
-	auth = fmt.Sprintf("%s:%s@%s(%s:%s)/%s",
+	auth = fmt.Sprintf("%s:%s@%s(%s:%s)/%s",    //USE db 가 되지 않기 때문에 다시 접속함.
 	dc.User, dc.Password, dc.Protocol, dc.Host, dc.Port,dc.Name)
 
 
 	db, err = sql.Open(dc.Type, auth)
 	if err != nil {
 		return err
-	}
-
-
-	createAttendTable := `
-	CREATE TABLE IF NOT EXISTS attendance (
-        id VARCHAR(65) NOT NULL,
-        attend_count INT DEFAULT NULL,
-        last_seen DATE DEFAULT NULL,
-        conseq_count INT DEFAULT NULL,
-        PRIMARY KEY (id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-	`
-	_, err = db.Exec(createAttendTable)
-	if err != nil {
-		fmt.Println("DB creat error", err)
-	}
-
-	createWalletTable := `
-	CREATE TABLE IF NOT EXISTS wallet (
-		id VARCHAR(65) NOT NULL,
-		money INT DEFAULT NULL,
-		exp INT DEFAULT NULL,
-		PRIMARY KEY (id)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-	`
-	_, err = db.Exec(createWalletTable)
-	if err != nil {
-		fmt.Println("DB creat error", err)
 	}
 
 	return nil
