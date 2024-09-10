@@ -11,7 +11,6 @@ import (
 func Slotmachine(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	userID := i.Member.User.ID
-	
 
 	playermoney, err := LoadWallet(userID)
 
@@ -21,17 +20,16 @@ func Slotmachine(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	}
 
 	if playermoney.Money < 10 {
-		SendInteractionMessage(s,i,"돈이 부족해요")
+		SendInteractionMessage(s, i, "돈이 부족해요")
 		return
 	} else {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Flags:   discordgo.MessageFlagsEphemeral,
+				Flags: discordgo.MessageFlagsEphemeral,
 			},
 		})
 	}
-
 
 	_, err = s.ChannelMessageSend(i.ChannelID, "**--SLOTS--**")
 	if err != nil {
@@ -91,21 +89,33 @@ func Slotmachine(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	//당첨 조건
 	if slot4 == slot5 && slot5 == slot6 {
-		s.FollowupMessageCreate(i.Interaction,true,&discordgo.WebhookParams{
-			Content: "잭팟! (money += 5000)",
+		msg := "잭팟! money += 5000"
+		_, err = s.ChannelMessageSend(i.ChannelID, msg)
+		if err != nil {
+			fmt.Println("slot | send message error", err)
+			return
+		}
+		s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+			Content: "🥳🎉🎉🎉",
 		})
 
-		err = GiveMoneyExp(userID, 5000,1)
+		err = GiveMoneyExp(userID, 5000, 1)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 	} else {
-		s.FollowupMessageCreate(i.Interaction,true,&discordgo.WebhookParams{
-			Content: "실패! (money -= 10)",
+		msg := "# 실패!!! money -= 10"
+		_, err = s.ChannelMessageSend(i.ChannelID, msg)
+		if err != nil {
+			fmt.Println("slot | send message error", err)
+			return
+		}
+		s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+			Content: "😭😭",
 		})
 
-		err = GiveMoneyExp(userID, -10,1)
+		err = GiveMoneyExp(userID, -10, 1)
 		if err != nil {
 			fmt.Println(err)
 			return

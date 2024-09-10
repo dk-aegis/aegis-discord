@@ -13,13 +13,14 @@ func MemberJoin(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 	//뜸들이기
 	time.Sleep(time.Second * 5)
 
-	msg := fmt.Sprintf("Welcome To Aegis Server <@%s>!", m.User.ID)
+	msg := fmt.Sprintf("Welcome To Aegis Server <@%s>! 별명을 '학번이름(재학)' 으로 설정해주세요!", m.User.ID)
 	_, err := s.ChannelMessageSend(global.Discord.WelcomeChannelID, msg)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
+	//역할 추가되는거 좀 모르겠네
 	err = s.GuildMemberRoleAdd(global.Discord.GuildID, m.User.ID, global.Discord.Role.StudentRoleID)
 	if err != nil {
 		fmt.Println(err)
@@ -48,7 +49,7 @@ func ForkallGuild(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	for index, member := range MemList {
 		err := Regist_user(s, member.User.ID)
-	
+
 		if err != nil {
 			fmt.Printf("err: %v\n", err)
 			continue
