@@ -21,6 +21,9 @@ func ShowUserInfo(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
+	loc, _ := time.LoadLocation("Asia/Seoul")
+	currentTime := time.Now().In(loc)
+
 	embed := &discordgo.MessageEmbed{
 		Title: "User Infomation",
 		Color: 0x00ff00,
@@ -48,8 +51,8 @@ func ShowUserInfo(s *discordgo.Session, i *discordgo.InteractionCreate) {
 				Value: At.Lastseen,
 			},
 			{
-				Name: ".",
-				Value: time.Now().Format("2006-01-02 15:04:05"),
+				Name:  ".",
+				Value: currentTime.Format("2006-01-02 15:04:05"),
 			},
 		},
 	}
