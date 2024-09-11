@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -45,6 +46,10 @@ func ShowUserInfo(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			{
 				Name:  "마지막 출석 날짜",
 				Value: At.Lastseen,
+			},
+			{
+				Name: ".",
+				Value: time.Now().Format("2006-01-02 15:04:05"),
 			},
 		},
 	}
