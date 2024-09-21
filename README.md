@@ -76,7 +76,7 @@ STUDENTROLE_ID = 재학생 ID
 ```json
 {
     "token" : "token value",
-    "guild_id" : "1223177363722862612"
+    "guild_id" : "guild id"
 }
 ```
 
